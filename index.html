@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedantix — Devinez la page Wikipedia</title>
+  <meta name="description" content="Devinez la page Wikipedia en proposant des mots." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <style>
+    [data-theme=dark] {
+      --bg-base: #07070f;
+      --bg-card: rgba(16, 16, 30, 0.9);
+      --bg-input: rgba(25, 25, 45, 0.7);
+      --bg-hover: rgba(255, 255, 255, 0.05);
+      --border: rgba(100, 100, 180, 0.14);
+      --border-accent: rgba(99, 102, 241, 0.35);
+      --text-1: #e8ecf4;
+      --text-2: #a0a8c0;
+      --text-3: #6b7394;
+      --punct: #4a5070;
+    }
+
+    [data-theme=light] {
+      --bg-base: #f0f0f5;
+      --bg-card: rgba(255, 255, 255, 0.93);
+      --bg-input: rgba(235, 235, 248, 0.9);
+      --bg-hover: rgba(0, 0, 0, 0.04);
+      --border: rgba(100, 100, 180, 0.18);
+      --border-accent: rgba(99, 102, 241, 0.4);
+      --text-1: #1a1a2e;
+      --text-2: #4a4a70;
+      --text-3: #8080a0;
+      --punct: #b0b0c8;
+    }
+
+    :root {
+      --accent: #6366f1;
+      --success: #22c55e;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background .35s, color .35s
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: radial-gradient(ellipse 80% 60% at 15% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 60%)
+    }
+
+    [data-theme=light] body::before {
+      opacity: .45
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(7, 7, 15, 0.85);
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem
+    }
+
+    [data-theme=light] .header {
+      background: rgba(240, 240, 245, 0.9)
+    }
+
+    /* toast feedback */
+    .toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: .42rem 1rem;
+      font-size: .84rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+      opacity: 0;
+      transition: opacity .22s, transform .22s;
+      pointer-events: none;
+      z-index: 300;
+      white-space: nowrap
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-3);
+      padding: .38rem .6rem;
+      font-size: .95rem;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: var(--radius-sm)
+    }
+
+    .btn-icon:hover {
+      color: var(--text-1);
+      border-color: var(--border-accent)
+    }
+
+    .logo {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -.02em
+    }
+
+    .logo span {
+      color: var(--accent)
+    }
+
+    .logo-badge {
+      font-size: .6rem;
+      font-weight: 700;
+      background: rgba(99, 102, 241, .15);
+      border: 1px solid rgba(99, 102, 241, .3);
+      color: var(--accent);
+      padding: .15rem .5rem;
+      border-radius: 20px;
+      letter-spacing: .05em;
+      text-transform: uppercase
+    }
+
+    .header-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .25rem
+    }
+
+    .input-row {
+      display: flex;
+      gap: .5rem;
+      width: 100%;
+      max-width: 500px
+    }
+
+    .guess-input {
+      flex: 1;
+      background: var(--bg-input);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-sm);
+      color: var(--text-1);
+      padding: .5rem .9rem;
+      font-size: .95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition)
+    }
+
+    .guess-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .15)
+    }
+
+    .guess-input::placeholder {
+      color: var(--text-3)
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: .88rem;
+      padding: .5rem 1.1rem;
+      transition: all .2s ease;
+      white-space: nowrap
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      background: #4f52d4;
+      transform: translateY(-1px)
+    }
+
+    .btn-primary:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid var(--border);
+      color: var(--text-2)
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, .08);
+      color: var(--text-1)
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, .15);
+      border: 1px solid rgba(239, 68, 68, .3);
+      color: #fca5a5
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, .25)
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 1.2rem;
+      font-size: .74rem;
+      color: var(--text-3);
+      align-items: center
+    }
+
+    .stat-found {
+      color: var(--success);
+      font-weight: 600
+    }
+
+    .header-actions {
+      display: flex;
+      gap: .5rem;
+      align-items: center
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 1.2rem;
+      padding: 1.2rem 1.5rem;
+      max-width: 1300px;
+      margin: 0 auto
+    }
+
+    .article-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem 2rem;
+      min-height: 300px
+    }
+
+    .article-title-area {
+      font-size: 1.45rem;
+      font-weight: 800;
+      line-height: 2.5;
+      padding-bottom: 1.2rem;
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .article-body {
+      line-height: 2.6;
+      font-size: .95rem;
+      word-spacing: 3px
+    }
+
+    .article-body p {
+      margin-bottom: 1.8rem
+    }
+
+    .section-title {
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 2rem 0 .8rem;
+      letter-spacing: .03em;
+      border-left: 3px solid var(--accent);
+      padding: .35rem 0 .35rem .8rem;
+      border-bottom: none;
+      background: rgba(99,102,241,.04)
+    }
+
+    .section-title.h3 {
+      font-size: .8rem;
+      margin-left: 1.2rem;
+      border-left-color: var(--text-3);
+      color: var(--text-2)
+    }
+
+    .word-block {
+      display: inline-block;
+      position: relative;
+      border-radius: 4px;
+      vertical-align: middle;
+      cursor: default;
+      height: 1.2em;
+      margin: 0 2px;
+      transition: background-color .45s ease
+    }
+
+    .word-block.hidden {
+      cursor: pointer;
+      margin-bottom: 1.4em;
+      border: 1px solid rgba(255,255,255,.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.35);
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums
+    }
+    [data-theme=light] .word-block.hidden {
+      border-color: rgba(0,0,0,.1);
+      color: rgba(0,0,0,.3)
+    }
+
+    .word-block.hidden:hover {
+      filter: brightness(1.25);
+      border-color: rgba(255,255,255,.2)
+    }
+    [data-theme=light] .word-block.hidden:hover { border-color: rgba(0,0,0,.2) }
+
+    .word-block.hidden::after {
+      content: attr(data-best-guess);
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 8.5px;
+      font-style: italic;
+      font-weight: 400;
+      color: rgba(160, 180, 220, .45);
+      white-space: nowrap;
+      pointer-events: none;
+      line-height: 1
+    }
+
+    .word-block.stopword {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-3) !important;
+      font-size: .82rem;
+      font-weight: 400;
+      height: auto;
+      margin-bottom: 0;
+      cursor: default;
+      padding: 0 1px
+    }
+    .word-block.stopword::after { display: none }
+
+    .word-block.revealed {
+      color: #fff !important;
+      background-color: var(--success) !important;
+      box-shadow: 0 0 8px rgba(34, 197, 94, .4), 0 0 2px rgba(34, 197, 94, .6);
+      animation: wordReveal .35s ease-out;
+      cursor: default;
+      padding: 1px 5px;
+      height: auto;
+      margin-bottom: 0;
+      border-radius: 4px;
+      border: none;
+      font-size: .88rem;
+      font-weight: 600
+    }
+
+    .word-block.flash-new {
+      animation: flashNew .9s ease-out forwards !important
+    }
+
+    .word-block.title-block {
+      height: 1.25em
+    }
+
+    .word-block.win-cascade {
+      animation: winCascade .45s ease-out forwards !important;
+      color: #fff !important;
+      padding: 1px 4px;
+      height: auto;
+      margin-bottom: 0;
+      border-radius: 3px
+    }
+
+    @keyframes wordReveal {
+      from {
+        transform: scale(.88);
+        opacity: .4
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    @keyframes flashNew {
+      0% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, .9), 0 0 18px rgba(34, 197, 94, .6);
+        filter: brightness(1.8)
+      }
+
+      55% {
+        box-shadow: 0 0 0 12px rgba(34, 197, 94, 0);
+        filter: brightness(1.1)
+      }
+
+      100% {
+        box-shadow: none;
+        filter: brightness(1)
+      }
+    }
+
+    @keyframes winCascade {
+      0% {
+        opacity: 0;
+        transform: scale(.75) translateY(5px);
+        background-color: #16a34a
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        background-color: #16a34a
+      }
+    }
+
+    .punct-token {
+      color: var(--punct);
+      user-select: none;
+      vertical-align: middle
+    }
+
+    /* confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 600;
+      display: none
+    }
+
+    .sidebar {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.2rem;
+      position: sticky;
+      top: 100px;
+      max-height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .8rem;
+      padding-bottom: .7rem;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .sidebar-title {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-3)
+    }
+
+    .sidebar-count {
+      background: var(--accent);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .guess-list {
+      overflow-y: auto;
+      flex: 1
+    }
+
+    .guess-list::-webkit-scrollbar {
+      width: 3px
+    }
+
+    .guess-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px
+    }
+
+    .guess-empty {
+      text-align: center;
+      color: var(--text-3);
+      font-size: .8rem;
+      padding: 2rem 0;
+      font-style: italic
+    }
+
+    .guess-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: .5rem;
+      padding: .35rem .6rem;
+      border-radius: var(--radius-sm);
+      transition: background-color .15s
+    }
+
+    .guess-item:hover {
+      background: var(--bg-hover)
+    }
+
+    .guess-item+.guess-item {
+      border-top: 1px solid rgba(255, 255, 255, .04)
+    }
+
+    @keyframes guessSlideIn {
+      from {
+        transform: translateX(-6px);
+        opacity: 0
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1
+      }
+    }
+
+    .guess-num {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--text-3);
+      min-width: 1.2rem;
+      text-align: right;
+      flex-shrink: 0
+    }
+
+    .guess-word {
+      flex: 1;
+      font-size: .87rem;
+      font-weight: 600;
+      color: var(--text-1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .guess-badge {
+      font-size: .65rem;
+      font-weight: 700;
+      padding: .1rem .4rem;
+      border-radius: 10px;
+      flex-shrink: 0
+    }
+
+    .guess-badge.found {
+      background: var(--success);
+      color: #fff
+    }
+
+    .guess-badge.miss {
+      background: rgba(255, 255, 255, .06);
+      color: var(--text-3)
+    }
+
+    .guess-prox-pct {
+      font-size: .72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      min-width: 3.2rem;
+      text-align: right
+    }
+
+    .progress-wrap {
+      margin-top: .5rem
+    }
+
+    .progress-track {
+      height: 3px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 2px;
+      overflow: hidden
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width .5s ease
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, .7);
+      backdrop-filter: blur(6px)
+    }
+
+    .overlay.hidden {
+      display: none
+    }
+
+    .overlay-card {
+      background: rgba(14, 14, 26, .97);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .6)
+    }
+
+    .overlay-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: .5rem
+    }
+
+    .overlay-sub {
+      color: var(--text-2);
+      font-size: .9rem;
+      margin-bottom: 1.5rem
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(99, 102, 241, .2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+      margin: 0 auto 1rem
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .loading-step {
+      font-size: .8rem;
+      color: var(--text-3);
+      margin-top: .5rem
+    }
+
+    .win-emoji {
+      font-size: 3rem;
+      margin-bottom: .8rem
+    }
+
+    .win-article-title {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: .5rem
+    }
+
+    .win-stats {
+      color: var(--text-2);
+      font-size: .88rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.7
+    }
+
+    .win-actions {
+      display: flex;
+      flex-direction: column;
+      gap: .7rem
+    }
+
+    .win-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: .83rem
+    }
+
+    .win-link:hover {
+      text-decoration: underline
+    }
+
+    /* ─── Category overlay ─── */
+    .cat-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 510;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(4, 4, 14, .88);
+      backdrop-filter: blur(10px)
+    }
+
+    [data-theme=light] .cat-overlay {
+      background: rgba(220, 220, 238, .88)
+    }
+
+    .cat-overlay.hidden {
+      display: none
+    }
+
+    .cat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.8rem 1.8rem 1.5rem;
+      max-width: 680px;
+      width: 96%;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 32px 100px rgba(0, 0, 0, .6)
+    }
+
+    .cat-card::-webkit-scrollbar {
+      width: 4px
+    }
+
+    .cat-card::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px
+    }
+
+    .cat-header {
+      text-align: center;
+      margin-bottom: 1.2rem
+    }
+
+    .cat-header h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: .28rem
+    }
+
+    .cat-header p {
+      color: var(--text-2);
+      font-size: .84rem
+    }
+
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+      gap: .6rem;
+      margin-bottom: 1.1rem
+    }
+
+    .cat-item {
+      position: relative;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: .9rem .85rem .78rem;
+      cursor: pointer;
+      transition: border-color .2s, background .2s, transform .15s;
+      text-align: left;
+      user-select: none;
+      overflow: hidden
+    }
+
+    .cat-item:hover {
+      border-color: var(--border-accent);
+      background: rgba(99, 102, 241, .05);
+      transform: translateY(-2px)
+    }
+
+    .cat-item.selected {
+      background: rgba(99, 102, 241, .1)
+    }
+
+    .cat-item .cat-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 14px 0 0 14px;
+      opacity: 0;
+      transition: opacity .2s
+    }
+
+    .cat-item.selected .cat-bar {
+      opacity: 1
+    }
+
+    .cat-item .cat-check {
+      position: absolute;
+      top: .5rem;
+      right: .5rem;
+      width: 17px;
+      height: 17px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .65rem;
+      transition: all .18s
+    }
+
+    .cat-item.selected .cat-check {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff
+    }
+
+    .cat-icon {
+      font-size: 1.7rem;
+      margin-bottom: .42rem;
+      display: block;
+      line-height: 1
+    }
+
+    .cat-name {
+      font-size: .86rem;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: .14rem
+    }
+
+    .cat-desc {
+      font-size: .7rem;
+      color: var(--text-3);
+      line-height: 1.3
+    }
+
+    .cat-hint {
+      text-align: center;
+      font-size: .7rem;
+      color: var(--text-3);
+      margin-bottom: .8rem
+    }
+
+    .cat-actions {
+      display: flex;
+      gap: .65rem;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .cat-actions .btn {
+      min-width: 125px;
+      padding: .52rem 1.1rem;
+      font-size: .86rem
+    }
+
+    .btn-surprise {
+      background: linear-gradient(135deg, #f97316, #ef4444) !important;
+      color: #fff !important;
+      border: none !important
+    }
+
+    .btn-surprise:hover {
+      opacity: .88;
+      transform: translateY(-1px) !important
+    }
+
+    /* ─ Difficulty selector */
+    .diff-row {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      margin-bottom: 1.1rem
+    }
+
+    .diff-btn {
+      flex: 1;
+      max-width: 160px;
+      padding: .55rem .6rem;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      font-family: inherit;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .18s;
+      text-align: center;
+      line-height: 1.3
+    }
+
+    .diff-btn:hover {
+      border-color: var(--border-accent);
+      color: var(--text-1);
+      transform: translateY(-1px)
+    }
+
+    .diff-btn.active {
+      color: #fff;
+      border-color: transparent
+    }
+
+    .diff-btn.easy.active {
+      background: #22c55e
+    }
+
+    .diff-btn.normal.active {
+      background: #f59e0b
+    }
+
+    .diff-btn.hard.active {
+      background: #ef4444
+    }
+
+    .diff-sep {
+      text-align: center;
+      font-size: .7rem;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: .7rem
+    }
+
+    @media(max-width:768px) {
+      .main {
+        grid-template-columns: 1fr
+      }
+
+      .sidebar {
+        position: static;
+        max-height: 280px
+      }
+
+      .cat-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr))
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  <header class="header">
+    <div style="display:flex;align-items:center;gap:.6rem;flex-shrink:0">
+      <span class="logo">Ped<span>antix</span></span>
+      <span class="logo-badge">V4</span>
+    </div>
+    <div class="header-center">
+      <div class="input-row">
+        <input id="guess-input" class="guess-input" type="text" placeholder="Proposez un mot..." autocomplete="off"
+          spellcheck="false" />
+        <button id="guess-btn" class="btn btn-primary" disabled>Envoyer</button>
+      </div>
+      <div class="stats-row">
+        <span id="cat-display" style="font-weight:700;color:var(--accent)"></span>
+        <span>Essais : <strong id="guess-count-val">0</strong></span>
+        <span class="stat-found"><strong id="found-count-val">0</strong> / <strong id="total-count-val">0</strong>
+          mots</span>
+        <span><strong id="pct-val">0</strong>%</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="theme-btn" class="btn btn-icon" title="Thème clair/sombre">&#x1F319;</button>
+      <button id="cat-btn" class="btn btn-ghost" style="font-size:.8rem">&#x1F4CB; Catégorie</button>
+      <button id="reveal-btn" class="btn btn-danger">Abandonner</button>
+      <button id="new-game-btn" class="btn btn-primary">&#x25B6; Nouvelle partie</button>
+    </div>
+  </header>
+  <div class="toast" id="toast"></div>
+  <header style="display:none">
+  </header>
+  <main class="main">
+    <div class="article-card">
+      <div id="title-area" class="article-title-area"></div>
+      <div id="text-area" class="article-body"></div>
+    </div>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Mots proposés</span>
+        <span class="sidebar-count" id="sidebar-count">0</span>
+      </div>
+      <div class="guess-list" id="guess-list">
+        <div class="guess-empty">Aucun mot proposé</div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="overlay" id="loading-overlay">
+    <div class="overlay-card">
+      <div class="loading-spinner"></div>
+      <div class="overlay-title">Chargement…</div>
+      <div id="loading-step" class="loading-step">Récupération de l'article Wikipédia…</div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="win-overlay">
+    <div class="overlay-card">
+      <div class="win-emoji">🎉</div>
+      <div class="overlay-title">Bravo !</div>
+      <div id="win-article-title" class="win-article-title"></div>
+      <div id="win-stats" class="win-stats"></div>
+      <div class="win-actions">
+        <a id="win-wiki-link" class="win-link" href="#" target="_blank" rel="noopener">→ Voir l'article Wikipédia</a>
+        <button id="win-new-game-btn" class="btn btn-primary">Nouvelle partie</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Category overlay ── -->
+  <div class="cat-overlay hidden" id="cat-overlay">
+    <div class="cat-card">
+      <div class="cat-header">
+        <h2>&#x1F3AF; Choisissez une catégorie</h2>
+        <p>Sélectionnez une ou plusieurs catégories — l'article sera tiré au sort parmi elles.</p>
+      </div>
+      <!-- Difficulty -->
+      <div class="diff-sep">Difficulté</div>
+      <div class="diff-row">
+        <button class="diff-btn easy active" data-diff="easy">🟢 Facile<br><small
+            style="font-weight:400;opacity:.8">Articles populaires</small></button>
+        <button class="diff-btn normal" data-diff="normal">🟡 Normal<br><small
+            style="font-weight:400;opacity:.8">Articles connus</small></button>
+        <button class="diff-btn hard" data-diff="hard">🔴 Difficile<br><small style="font-weight:400;opacity:.8">Tout
+            Wikipedia</small></button>
+      </div>
+      <!-- Categories -->
+      <div class="diff-sep">Catégorie (optionnel)</div>
+      <div class="cat-grid" id="cat-grid"></div>
+      <p class="cat-hint"><span id="cat-sel-count">0</span> catégorie(s) sélectionnée(s)</p>
+      <div class="cat-actions">
+        <button class="btn btn-surprise" id="surprise-btn">&#x1F3B2; Surprise !</button>
+        <button class="btn btn-primary" id="play-btn" disabled>&#x25B6; Jouer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Categories definition
+    const CATEGORIES = [
+      { id: 'geo', name: 'Géographie', icon: '🌍', desc: 'Pays, villes, fleuves, régions', color: '#3b82f6', cmtitles: ['Catégorie:Pays', 'Catégorie:Capitale'] },
+      { id: 'hist', name: 'Histoire', icon: '🏛️', desc: 'Batailles, empires, révolutions', color: '#f59e0b', cmtitles: ['Catégorie:Bataille', 'Catégorie:Traité'] },
+      { id: 'sci', name: 'Sciences', icon: '🔬', desc: 'Physique, maths, chimie, biologie', color: '#06b6d4', cmtitles: ['Catégorie:Physicien', 'Catégorie:Mathématicien', 'Catégorie:Chimiste'] },
+      { id: 'nature', name: 'Nature', icon: '🦁', desc: 'Animaux, plantes, écosystèmes', color: '#22c55e', cmtitles: ['Catégorie:Mammifère', 'Catégorie:Oiseau', 'Catégorie:Reptile'] },
+      { id: 'cinema', name: 'Cinéma', icon: '🎬', desc: 'Films, réalisateurs, acteurs', color: '#ec4899', cmtitles: ['Catégorie:Film français', 'Catégorie:Réalisateur français'] },
+      { id: 'sport', name: 'Sport', icon: '⚽', desc: 'Football, tennis, athlétisme', color: '#f97316', cmtitles: ['Catégorie:Footballeur international français', 'Catégorie:Joueur de tennis'] },
+      { id: 'art', name: 'Arts & Musique', icon: '🎨', desc: 'Peinture, musique, sculpture', color: '#a855f7', cmtitles: ['Catégorie:Peintre français', 'Catégorie:Compositeur français'] },
+      { id: 'litt', name: 'Littérature', icon: '📚', desc: 'Romans, auteurs, poésie', color: '#14b8a6', cmtitles: ['Catégorie:Romancier français', 'Catégorie:Poète français'] },
+      { id: 'techno', name: 'Technologie', icon: '💻', desc: 'Informatique, inventions, ingénieurs', color: '#8b5cf6', cmtitles: ['Catégorie:Informaticien', 'Catégorie:Inventeur'] },
+      { id: 'gastro', name: 'Gastronomie', icon: '🍽️', desc: 'Cuisines, plats, chefs, vins', color: '#ef4444', cmtitles: ['Catégorie:Cuisine française', 'Catégorie:Gastronomie française'] },
+    ];
+
+    // ── Category UI
+    let selectedCats = new Set();
+    function buildCatGrid() {
+      const g = document.getElementById('cat-grid'); g.innerHTML = '';
+      CATEGORIES.forEach(cat => {
+        const el = document.createElement('div'); el.className = 'cat-item'; el.dataset.id = cat.id;
+        el.innerHTML = `<div class="cat-bar" style="background:${cat.color}"></div><div class="cat-check">✓</div><span class="cat-icon">${cat.icon}</span><div class="cat-name">${cat.name}</div><div class="cat-desc">${cat.desc}</div>`;
+        el.addEventListener('click', () => {
+          if (selectedCats.has(cat.id)) { selectedCats.delete(cat.id); el.classList.remove('selected'); } else { selectedCats.add(cat.id); el.classList.add('selected'); }
+          const n = selectedCats.size; document.getElementById('cat-sel-count').textContent = n; document.getElementById('play-btn').disabled = n === 0;
+        });
+        g.appendChild(el);
+      });
+    }
+    function openCatOverlay() { document.getElementById('cat-overlay').classList.remove('hidden'); }
+    function closeCatOverlay() { document.getElementById('cat-overlay').classList.add('hidden'); }
+    buildCatGrid();
+    document.getElementById('surprise-btn').addEventListener('click', () => { closeCatOverlay(); startGame(null); });
+    document.getElementById('play-btn').addEventListener('click', () => { closeCatOverlay(); startGame([...selectedCats]); });
+    document.getElementById('cat-btn').addEventListener('click', openCatOverlay);
+
+    // ── Wikipedia helpers
+    async function fetchArticleByTitle(title) {
+      const r = await fetch(`${WIKI}?action=query&format=json&titles=${encodeURIComponent(title)}&prop=extracts|info&explaintext=true&inprop=url&origin=*`);
+      const d = await r.json(); const pages = Object.values(d?.query?.pages || {}); if (!pages.length) return null;
+      const p = pages[0]; if (p.missing !== undefined) return null;
+      const ex = p.extract || '', url = p.fullurl || `https://fr.wikipedia.org/wiki/${title}`;
+      if (ex.length < 800) return null;
+      if (ex.split(/\s+/).filter(w => /^[a-zA-ZÀ-ÿ]{3,}$/.test(w)).length < 80) return null;
+      if (REJECT.some(k => normalize(ex).includes(k) || normalize(title).includes(k))) return null;
+      return { title: p.title || title, extract: ex, url };
+    }
+    async function fetchCatMembers(cmtitle) {
+      const r = await fetch(`${WIKI}?action=query&list=categorymembers&cmtitle=${encodeURIComponent(cmtitle)}&cmlimit=500&cmtype=page&cmnamespace=0&format=json&origin=*`);
+      const d = await r.json(); return d?.query?.categorymembers || [];
+    }
+    async function fetchFromCategories(catIds) {
+      const catId = catIds[Math.random() * catIds.length | 0]; const cat = CATEGORIES.find(c => c.id === catId); if (!cat) return null;
+      const shuffled = [...cat.cmtitles].sort(() => Math.random() - .5);
+      for (const cmtitle of shuffled) {
+        let members; try { members = await fetchCatMembers(cmtitle); } catch (e) { continue; } if (!members.length) continue;
+        const tries = Math.min(10, members.length);
+        const idxs = Array.from({ length: members.length }, (_, i) => i).sort(() => Math.random() - .5).slice(0, tries);
+        for (const idx of idxs) { try { const art = await fetchArticleByTitle(members[idx].title); if (art) return art; } catch (e) { } }
+      }
+      return null;
+    }
+
+    // ── French NLP (rule-based, no external deps)
+    function normalize(t) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z]/g, '') }
+    function lemmatize(w) {
+      w = w.toLowerCase();
+      const rules = [[/(aient|asses|isses|ussent|eraient|iraient)$/, ''], [/(ais|ait|ons|ez|ant|ants|antes)$/, ''], [/(er|ir|re)$/, ''], [/(aux)$/, 'al'], [/(eaux)$/, 'eau'], [/(iques|ique)$/, 'ique'], [/(tions|tion)$/, 'tion'], [/(ments|ment)$/, 'ment'], [/(eurs|eur)$/, 'eur'], [/(euses|euse)$/, 'eux'], [/(ives|ive|ifs|if)$/, 'if'], [/(ales|ale|als|al)$/, 'al'], [/(nnes|nne)$/, 'n'], [/(es)$/, ''], [/(s)$/, '']];
+      for (const [p, r] of rules) { const c = w.replace(p, r); if (c.length >= 3 && c !== w) return c; }
+      return w;
+    }
+
+    // ── Character n-gram word vectors (cosine similarity, offline)
+    const V = 512;
+    function wordVec(word) {
+      const w = normalize(word), v = new Float32Array(V);
+      const h = (s, seed) => { let h = seed * 2654435761; for (let i = 0; i < s.length; i++) { h = Math.imul(h ^ s.charCodeAt(i), 2654435761); h ^= h >>> 16 } return Math.abs(h) % V };
+      for (const c of w) v[h(c, 0)]++;
+      for (let i = 0; i < w.length - 1; i++)v[h(w[i] + w[i + 1], 1)]++;
+      for (let i = 0; i < w.length - 2; i++)v[h(w[i] + w[i + 1] + w[i + 2], 2)]++;
+      return v;
+    }
+    function cosSim(a, b) { let d = 0, na = 0, nb = 0; for (let i = 0; i < V; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i] } return na && nb ? Math.max(0, d / (Math.sqrt(na) * Math.sqrt(nb))) : 0 }
+
+    // ── Theme
+    const themeBtn = document.getElementById('theme-btn');
+    let _isDark = true;
+    themeBtn.addEventListener('click', () => {
+      _isDark = !_isDark;
+      document.documentElement.dataset.theme = _isDark ? 'dark' : 'light';
+      themeBtn.textContent = _isDark ? '\uD83C\uDF19' : '\u2600\uFE0F';
+      // re-color all hidden blocks
+      document.querySelectorAll('.word-block.hidden').forEach(el => {
+        const tok = game?.allW.find(t => t.id == el.dataset.id);
+        if (tok) el.style.backgroundColor = proxColor(tok.bestProx);
+      });
+    });
+
+    // ── Toast
+    let _tt = null;
+    function showToast(msg, color, dur = 1800) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.color = color;
+      t.classList.add('show');
+      clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('show'), dur);
+    }
+
+    // ── Web Audio (no external files)
+    let _ac = null;
+    function getAC() { if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)(); return _ac; }
+    function beep(freq, dur, vol = 0.12, type = 'sine') {
+      try {
+        const c = getAC(), o = c.createOscillator(), g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.type = type; o.frequency.value = freq;
+        g.gain.setValueAtTime(vol, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+        o.start(); o.stop(c.currentTime + dur);
+      } catch (e) { }
+    }
+    function sndFound(n) {
+      if (n === 0) { beep(220, .1, .07, 'triangle'); return; }
+      beep(660, .09, .13);
+      if (n > 2) setTimeout(() => beep(880, .1, .1), 70);
+      if (n > 5) setTimeout(() => beep(1100, .12, .08), 140);
+    }
+    function sndWin() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .22, .12), i * 100)); }
+    function sndDup() { beep(280, .08, .07, 'square'); }
+
+    // ── Confetti
+    function launchConfetti() {
+      const cv = document.getElementById('confetti-canvas');
+      cv.style.display = 'block'; cv.width = innerWidth; cv.height = innerHeight;
+      const cx = cv.getContext('2d');
+      const pts = Array.from({ length: 150 }, () => ({
+        x: Math.random() * innerWidth, y: -20 - Math.random() * innerHeight * .25,
+        w: 6 + Math.random() * 8, h: 3 + Math.random() * 5,
+        r: Math.random() * Math.PI * 2, dr: (.5 - Math.random()) * .13,
+        vx: (.5 - Math.random()) * 3, vy: 1.5 + Math.random() * 3.5,
+        c: `hsl(${Math.random() * 360 | 0},80%,60%)`
+      }));
+      let fr = 0;
+      (function draw() {
+        cx.clearRect(0, 0, cv.width, cv.height);
+        pts.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.r += p.dr; p.vy += .06;
+          cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r);
+          cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          cx.restore();
+        });
+        if (++fr < 220) requestAnimationFrame(draw);
+        else cv.style.display = 'none';
+      })();
+    }
+
+    // ── Hot/cold feedback
+    function toastFeedback(found, sim) {
+      if (found > 0) return [`+${found} mot${found > 1 ? 's' : ''} trouv${found > 1 ? 'es' : 'e'} !`, '#22c55e'];
+      if (sim >= .75) return ['\uD83D\uDD25 Brûlant !', '#ef4444'];
+      if (sim >= .60) return ['\u2668\uFE0F Très chaud !', '#f97316'];
+      if (sim >= .45) return ['\uD83C\uDF21 Chaud', '#f59e0b'];
+      if (sim >= .30) return ['\uD83C\uDF0A Tiède...', '#60a5fa'];
+      if (sim >= .15) return ['\u2744\uFE0F Froid', '#93c5fd'];
+      return ['\uD83E\uDDCA Très froid', '#6b7394'];
+    }
+
+    // ── Wikipedia API (CORS enabled)
+    const WIKI = 'https://fr.wikipedia.org/w/api.php';
+    const REJECT = ['homonymie', 'peut désigner', 'liste de', 'saison ', 'épisode ', 'élections '];
+
+    // ── Difficulty
+    let currentDiff = 'easy';
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentDiff = btn.dataset.diff;
+        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    async function fetchMostViewed(limit) {
+      // Wikipedia mostviewed API (last 60 days)
+      const r = await fetch(`${WIKI}?action=query&list=mostviewed&mvlimit=${limit}&format=json&origin=*`);
+      const d = await r.json();
+      return (d?.query?.mostviewed || []).filter(p => p.ns === 0 && !p.title.includes(':'));
+    }
+
+    async function fetchArticlePopular(limit) {
+      // Try up to 3 batches of mostviewed, picking random articles each time
+      let pool;
+      try { pool = await fetchMostViewed(limit); } catch (e) { return null; }
+      if (!pool.length) return null;
+      const shuffled = [...pool].sort(() => Math.random() - .5);
+      for (const entry of shuffled.slice(0, 20)) {
+        try {
+          const art = await fetchArticleByTitle(entry.title);
+          if (art) return art;
+        } catch (e) { }
+      }
+      return null;
+    }
+
+    async function fetchArticle() {
+      // Difficulty-aware fetching
+      if (currentDiff === 'easy') {
+        const art = await fetchArticlePopular(300);
+        if (art) return art;
+      } else if (currentDiff === 'normal') {
+        const art = await fetchArticlePopular(3000);
+        if (art) return art;
+      }
+      // Hard or fallback: full random
+      for (let t = 0; t < 8; t++) {
+        const r = await fetch(`${WIKI}?action=query&format=json&generator=random&grnnamespace=0&grnlimit=10&prop=extracts|info&explaintext=true&inprop=url&origin=*`);
+        const d = await r.json();
+        for (const p of Object.values(d?.query?.pages || {})) {
+          const title = p.title || '', ex = p.extract || '', url = p.fullurl || `https://fr.wikipedia.org/wiki/${title}`;
+          if (ex.length < 800) continue;
+          const wc = ex.split(/\s+/).filter(w => /^[a-zA-ZÀ-ÿ]{3,}$/.test(w)).length;
+          if (wc < 80) continue;
+          if (REJECT.some(k => ex.toLowerCase().includes(k) || title.toLowerCase().includes(k))) continue;
+          return { title, extract: ex, url };
+        }
+      }
+      throw new Error('Impossible de charger un article');
+    }
+
+    // ── Stop words (auto-revealed like real Pédantix)
+    const STOP_WORDS = new Set(['le','la','les','de','des','du','un','une','et','en','au','aux','a','à','par','pour','dans','sur','avec','que','qui','est','sont','ont','pas','plus','mais','ou','où','ne','se','ce','cette','ces','son','sa','ses','leur','leurs','il','elle','ils','elles','nous','vous','on','je','tu','me','te','lui','y','si','ni','dont','car','donc','comme','fut','fait','tous','tout','toute','toutes','entre','aussi','bien','peut','être','avoir','été','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','ans','après','avant','lors','depuis','jusqu','chez','vers','sous','sans','autre','autres','même','peu','très','alors','encore','déjà','ainsi','puis','ici','là']);
+
+    // ── Tokenizer
+    let tid = 0;
+    function tokenize(text) {
+      const parts = text.split(/(\s+|[^\w\u00C0-\u024F''-]+)/u), tokens = [];
+      for (const part of parts) {
+        if (!part) continue;
+        const isW = /^[\w\u00C0-\u024F''-]+$/u.test(part) && /[a-zA-ZÀ-ÿ]/.test(part);
+        if (isW) {
+          const lo = part.toLowerCase(), nm = normalize(part), lm = lemmatize(lo), lmn = normalize(lm);
+          const isStop = STOP_WORDS.has(lo);
+          tokens.push({ id: tid++, text: part, lower: lo, norm: nm, lemma: lm, lemNorm: lmn, vec: wordVec(part), isWord: true, revealed: isStop, isStop, bestProx: 0, bestGuess: null, length: part.length, ws: '' });
+        } else if (/\s/.test(part)) { if (tokens.length) tokens[tokens.length - 1].ws = part; }
+        else tokens.push({ id: tid++, text: part, isWord: false, revealed: true, ws: '' });
+      }
+      return tokens;
+    }
+
+    function parseSections(ex) {
+      const lines = ex.split('\n'), secs = [];
+      let cur = null, buf = [];
+      const flush = () => { if (!buf.length) return; const s = buf.join(' ').trim(); if (s) { if (cur) cur.paras.push(s); else secs.push({ h: null, lv: 0, paras: [s] }); } buf = []; };
+      for (const l of lines) {
+        const h2 = l.match(/^==\s*(.+?)\s*==$/), h3 = l.match(/^===\s*(.+?)\s*===$/);
+        if (h2 || h3) { flush(); cur = { h: (h2 || h3)[1], lv: h2 ? 2 : 3, paras: [] }; secs.push(cur); }
+        else if (l.trim()) buf.push(l.trim());
+        else flush();
+      }
+      flush();
+      return secs.filter(s => s.paras.some(p => p.trim()));
+    }
+
+    // ── Game state
+    let game = null;
+
+    function initGame(title, extract, url) {
+      tid = 0;
+      const titleToks = tokenize(title);
+      const secs = parseSections(extract).map(s => ({ h: s.h, lv: s.lv, headToks: s.h ? tokenize(s.h) : null, paras: s.paras.map(p => tokenize(p)).filter(t => t.length) }));
+      const allW = [...titleToks.filter(t => t.isWord && !t.isStop)];
+      for (const s of secs) { if (s.headToks) allW.push(...s.headToks.filter(t => t.isWord && !t.isStop)); for (const p of s.paras) allW.push(...p.filter(t => t.isWord && !t.isStop)); }
+      game = { titleToks, secs, allW, totalWords: allW.length, guesses: [], won: false, url, title };
+    }
+
+    function guess(word) {
+      if (!game || game.won) return;
+      word = word.trim(); if (!word) return;
+      if (game.guesses.some(g => g.word.toLowerCase() === word.toLowerCase())) return { dup: true };
+      const lo = word.toLowerCase(), nm = normalize(word), lm = lemmatize(lo), lmn = normalize(lm), gv = wordVec(word);
+      let found = 0, bestSim = 0, bestW = null;
+      const newIds = new Set();
+      for (const t of game.allW) {
+        if (!t.revealed) {
+          const match = lo === t.lower || nm === t.norm || lm === t.lemma || lmn === t.lemNorm || nm === t.lemNorm || lmn === t.norm;
+          if (match) { t.revealed = true; found++; newIds.add(t.id); continue; }
+        }
+        const s = cosSim(gv, t.vec);
+        if (!t.revealed && s > t.bestProx) { t.bestProx = s; t.bestGuess = word; }
+        if (s > bestSim) { bestSim = s; bestW = t.text; }
+      }
+      const displaySim = found > 0 ? 1.0 : bestSim;
+      game.guesses.push({ word, found, sim: displaySim, closest: bestW });
+      if (game.titleToks.filter(t => t.isWord && !t.isStop).every(t => t.revealed)) game.won = true;
+      return { found, sim: displaySim, newIds };
+    }
+
+    // ── Colors — HSL gradient blue(cold) → green → red(hot)
+    const _dark = () => document.documentElement.dataset.theme === 'dark';
+    function proxColor(p) {
+      if (p <= 0.01) return _dark() ? 'hsl(240,18%,22%)' : 'hsl(235,18%,82%)';
+      // Blue(cold) → Cyan → Green → Yellow → Red(hot)
+      const hue = p < 0.5 ? 230 - p * 2 * 120 : 110 - (p - 0.5) * 2 * 110;
+      const sat = 55 + p * 30 | 0;
+      const lit = _dark() ? 24 + p * 26 | 0 : 70 - p * 24 | 0;
+      return `hsl(${hue | 0},${sat}%,${lit}%)`;
+    }
+    function proxTxtColor(p) { return p < .25 ? '#6b7394' : p < .5 ? '#a0a8c0' : p < .7 ? '#f59e0b' : '#22c55e' }
+
+    // ── DOM rendering
+    function mkTok(tok, isT) {
+      if (!tok.isWord) { const s = document.createElement('span'); s.className = 'punct-token'; s.textContent = tok.text + tok.ws; return s; }
+      const s = document.createElement('span'); s.dataset.id = tok.id; s.dataset.length = tok.length;
+      if (tok.isStop) {
+        // Stop word: always visible, neutral styling
+        s.className = 'word-block stopword'; s.textContent = tok.text;
+      } else if (tok.revealed) {
+        s.className = `word-block revealed${isT ? ' title-block' : ''}`; s.textContent = tok.text;
+      } else {
+        s.className = `word-block hidden${isT ? ' title-block' : ''}`;
+        const cw = isT ? 11 : 9; s.style.width = s.style.minWidth = `${Math.max(tok.length * cw, 20)}px`;
+        s.style.backgroundColor = proxColor(tok.bestProx);
+        s.textContent = tok.length; // show letter count inside block
+        if (tok.bestGuess) s.dataset.bestGuess = tok.bestGuess;
+      }
+      const f = document.createDocumentFragment(); f.appendChild(s); if (tok.ws) f.appendChild(document.createTextNode(tok.ws)); return f;
+    }
+
+    function updateToks(container, toks, isT, newIds = new Set()) {
+      const map = {}; container.querySelectorAll('.word-block').forEach(el => { map[el.dataset.id] = el });
+      let firstNew = null;
+      for (const t of toks) {
+        if (!t.isWord) continue; const el = map[t.id]; if (!el) continue;
+        if (t.revealed && el.classList.contains('hidden')) {
+          el.className = `word-block revealed${isT ? ' title-block' : ''}`; el.textContent = t.text; el.style.cssText = ''; el.removeAttribute('data-best-guess');
+          const n = el.cloneNode(true); el.parentNode.replaceChild(n, el);
+          if (newIds.has(t.id)) { n.classList.add('flash-new'); if (!firstNew) firstNew = n; }
+        } else if (!t.revealed) {
+          el.style.backgroundColor = proxColor(t.bestProx);
+          if (t.bestGuess) el.dataset.bestGuess = t.bestGuess;
+        }
+      }
+      return firstNew;
+    }
+
+    function renderGame() {
+      const ta = document.getElementById('title-area'), ba = document.getElementById('text-area');
+      ta.innerHTML = ''; ba.innerHTML = '';
+      for (const t of game.titleToks) ta.appendChild(mkTok(t, true));
+      for (const sec of game.secs) {
+        if (sec.h && sec.headToks) { const h = document.createElement('div'); h.className = `section-title${sec.lv === 3 ? ' h3' : ''}`; for (const t of sec.headToks) h.appendChild(mkTok(t, false)); ba.appendChild(h); }
+        for (const para of sec.paras) { if (!para.length) continue; const p = document.createElement('p'); for (const t of para) p.appendChild(mkTok(t, false)); ba.appendChild(p); }
+      }
+    }
+
+    function updateGame(newIds = new Set()) {
+      const ta = document.getElementById('title-area'), ba = document.getElementById('text-area');
+      let first = updateToks(ta, game.titleToks, true, newIds);
+      for (const sec of game.secs) {
+        if (sec.headToks) { const r = updateToks(ba, sec.headToks, false, newIds); if (!first) first = r; }
+        for (const para of sec.paras) { const r = updateToks(ba, para, false, newIds); if (!first) first = r; }
+      }
+      // Scroll to first newly revealed word
+      if (first) setTimeout(() => first.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+    }
+
+    function renderGuesses() {
+      const list = document.getElementById('guess-list'), gs = game.guesses;
+      if (!gs.length) { list.innerHTML = '<div class="guess-empty">Aucun mot proposé</div>'; document.getElementById('sidebar-count').textContent = '0'; return; }
+      const existing = list.querySelectorAll('.guess-item').length;
+      if (existing === gs.length) return;
+      list.querySelector('.guess-empty')?.remove();
+      for (let i = gs.length - 1; i >= existing; i--) {
+        const g = gs[i], item = document.createElement('div'); item.className = 'guess-item'; item.style.animation = 'guessSlideIn .25s ease-out';
+        const n = document.createElement('span'); n.className = 'guess-num'; n.textContent = i + 1;
+        const w = document.createElement('span'); w.className = 'guess-word'; w.textContent = g.word;
+        const b = document.createElement('span'); b.className = `guess-badge ${g.found ? 'found' : 'miss'}`; b.textContent = g.found ? `+${g.found}` : '✗';
+        const p = document.createElement('span'); p.className = 'guess-prox-pct'; p.textContent = `${(g.sim * 100).toFixed(1)}%`; p.style.color = proxTxtColor(g.sim);
+        item.append(n, w, b, p); list.insertBefore(item, list.firstChild);
+      }
+      document.getElementById('sidebar-count').textContent = gs.length;
+    }
+
+    function updateStats() {
+      if (!game) return;
+      const rev = game.allW.filter(t => t.revealed).length, tot = game.totalWords, pct = tot ? Math.round(rev / tot * 100) : 0;
+      document.getElementById('guess-count-val').textContent = game.guesses.length;
+      document.getElementById('found-count-val').textContent = rev;
+      document.getElementById('total-count-val').textContent = tot;
+      document.getElementById('pct-val').textContent = pct;
+      let bar = document.querySelector('.progress-bar');
+      if (!bar) { const tr = document.createElement('div'); tr.className = 'progress-track'; bar = document.createElement('div'); bar.className = 'progress-bar'; tr.appendChild(bar); const wr = document.createElement('div'); wr.className = 'progress-wrap'; wr.appendChild(tr); document.querySelector('.stats-row').after(wr); }
+      bar.style.width = `${pct}%`;
+    }
+
+    // ── Main
+    async function startGame(catIds) {
+      document.getElementById('loading-overlay').classList.remove('hidden');
+      document.getElementById('win-overlay').classList.add('hidden');
+      document.getElementById('title-area').innerHTML = '';
+      document.getElementById('text-area').innerHTML = '';
+      document.getElementById('guess-list').innerHTML = '<div class="guess-empty">Aucun mot proposé</div>';
+      document.getElementById('sidebar-count').textContent = '0';
+      ['guess-count-val', 'found-count-val', 'total-count-val', 'pct-val'].forEach(id => document.getElementById(id).textContent = '0');
+      document.getElementById('guess-btn').disabled = true;
+      document.querySelector('.progress-wrap')?.remove();
+
+      // Set category label in header
+      const diffEmoji = { easy: '🟢', normal: '🟡', hard: '🔴' }[currentDiff] || '🎲';
+      const diffName = { easy: 'Facile', normal: 'Normal', hard: 'Difficile' }[currentDiff] || '';
+      let catLabel = `${diffEmoji} ${diffName}`;
+      if (catIds && catIds.length) {
+        const names = catIds.map(id => CATEGORIES.find(c => c.id === id)?.name || id);
+        const icons = catIds.map(id => CATEGORIES.find(c => c.id === id)?.icon || '');
+        const catPart = names.length === 1 ? `${icons[0]} ${names[0]}` : names.join(', ');
+        catLabel = `${diffEmoji} ${catPart}`;
+        document.getElementById('loading-step').textContent = `${diffName} · Recherche dans : ${names.join(', ')}...`;
+      } else {
+        document.getElementById('loading-step').textContent = `${diffName} · Sélection en cours...`;
+      }
+      document.getElementById('cat-display').textContent = catLabel;
+
+      try {
+        let article = null;
+        if (catIds && catIds.length) {
+          article = await fetchFromCategories(catIds);
+          if (!article) {
+            document.getElementById('loading-step').textContent = 'Catégorie vide, mode aléatoire...';
+            article = await fetchArticle();
+          }
+        } else {
+          article = await fetchArticle();
+        }
+        document.getElementById('loading-step').textContent = 'Analyse du texte…';
+        await new Promise(r => setTimeout(r, 10));
+        initGame(article.title, article.extract, article.url); renderGame(); updateStats();
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('guess-btn').disabled = false;
+        document.getElementById('guess-input').focus();
+      } catch (e) { document.getElementById('loading-step').textContent = '❌ ' + e.message; console.error(e); }
+    }
+
+    // ── Win cascade title
+    function cascadeTitle() {
+      document.getElementById('title-area').querySelectorAll('.word-block')
+        .forEach((el, i) => setTimeout(() => { el.className = 'word-block win-cascade'; el.style.cssText = ''; }, i * 130));
+    }
+
+    function submitGuess() {
+      const inp = document.getElementById('guess-input'), w = inp.value.trim();
+      if (!w || !game || game.won) return;
+      inp.value = '';
+      const r = guess(w);
+      if (r?.dup) { sndDup(); inp.placeholder = `"${w}" déjà proposé !`; setTimeout(() => inp.placeholder = 'Proposez un mot…', 1500); return; }
+      const ni = r?.newIds || new Set();
+      updateGame(ni); renderGuesses(); updateStats();
+      sndFound(r?.found || 0);
+      const [msg, col] = toastFeedback(r?.found || 0, r?.sim || 0);
+      showToast(msg, col);
+      if (game.won) {
+        sndWin(); cascadeTitle(); launchConfetti();
+        setTimeout(() => {
+          document.getElementById('win-overlay').classList.remove('hidden');
+          document.getElementById('win-article-title').textContent = game.title;
+          document.getElementById('win-stats').innerHTML = `${game.guesses.length} essai(s) — ${game.allW.filter(t => t.revealed).length} / ${game.totalWords} mots révélés`;
+          document.getElementById('win-wiki-link').href = game.url;
+        }, 1800);
+      }
+      inp.focus();
+    }
+
+    document.getElementById('guess-btn').addEventListener('click', submitGuess);
+    document.getElementById('guess-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitGuess() });
+    document.getElementById('new-game-btn').addEventListener('click', openCatOverlay);
+    document.getElementById('win-new-game-btn').addEventListener('click', () => {
+      document.getElementById('win-overlay').classList.add('hidden');
+      openCatOverlay();
+    });
+    document.getElementById('reveal-btn').addEventListener('click', () => {
+      if (!game || !confirm('Abandonner et révéler tous les mots ?')) return;
+      const ni = new Set(game.allW.filter(t => !t.revealed).map(t => t.id));
+      game.allW.forEach(t => t.revealed = true); game.won = true;
+      updateGame(ni); updateStats(); cascadeTitle();
+      setTimeout(() => {
+        document.getElementById('win-overlay').classList.remove('hidden');
+        document.getElementById('win-article-title').textContent = game.title;
+        document.getElementById('win-stats').innerHTML = `Abandonné — ${game.guesses.length} essai(s)`;
+        document.getElementById('win-wiki-link').href = game.url;
+      }, 1200);
+    });
+    // First load: show category selector
+    openCatOverlay();
+  </script>
+</body>
+
+</html>
