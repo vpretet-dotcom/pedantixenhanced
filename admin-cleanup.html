@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedantix — Nettoyage Firebase</title>
+  <style>
+    body { font-family: system-ui; max-width: 700px; margin: 2rem auto; padding: 0 1rem; background: #0a0a1a; color: #e8ecf4; }
+    h1 { font-size: 1.4rem; margin-bottom: 1rem; }
+    .info { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; font-size: .88rem; color: #a0a8c0; }
+    button { background: #6366f1; color: white; border: none; padding: .7rem 1.5rem; border-radius: 8px; font-size: .9rem; cursor: pointer; margin: .5rem .5rem .5rem 0; }
+    button:hover { background: #4f46e5; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .danger { background: #ef4444; }
+    .danger:hover { background: #dc2626; }
+    #log { background: rgba(0,0,0,0.3); border: 1px solid rgba(100,100,180,0.14); border-radius: 10px; padding: 1rem; font-family: monospace; font-size: .78rem; white-space: pre-wrap; min-height: 200px; max-height: 500px; overflow-y: auto; margin-top: 1rem; }
+    .stat { display: inline-block; background: rgba(99,102,241,0.1); padding: .3rem .8rem; border-radius: 6px; margin: .3rem; font-size: .82rem; }
+  </style>
+</head>
+<body>
+  <h1>🧹 Pedantix — Nettoyage Firebase</h1>
+  <div class="info">
+    <strong>Ce script nettoie ta base Firebase pour rester sous les limites du plan Spark (gratuit) :</strong>
+    <ul>
+      <li>Supprime les sessions multijoueur de plus de 24h</li>
+      <li>Limite le leaderboard à 100 entrées par article</li>
+      <li>Supprime les articles quotidiens de plus de 30 jours</li>
+    </ul>
+  </div>
+
+  <div id="stats"></div>
+
+  <button id="audit-btn">📊 Audit (lecture seule)</button>
+  <button id="clean-btn" class="danger" disabled>🧹 Nettoyer</button>
+
+  <div id="log">En attente...</div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js';
+    import { getDatabase, ref, get, remove, query, orderByChild, limitToLast } from 'https://www.gstatic.com/firebasejs/11.8.1/firebase-database.js';
+
+    const app = initializeApp(window.FIREBASE_CONFIG || {
+      apiKey: "AIzaSyAsm4o_y27Dlg-kSsupYKpV5mDr46jyMVg",
+      authDomain: "pedantix-49d72.firebaseapp.com",
+      databaseURL: "https://pedantix-49d72-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "pedantix-49d72",
+    });
+    const db = getDatabase(app);
+    const log = document.getElementById('log');
+    const statsEl = document.getElementById('stats');
+
+    function addLog(msg) { log.textContent += msg + '\n'; log.scrollTop = log.scrollHeight; }
+
+    let auditResult = null;
+
+    document.getElementById('audit-btn').addEventListener('click', async () => {
+      log.textContent = '';
+      addLog('🔍 Audit en cours...\n');
+      auditResult = { sessions: [], lbCleanup: [], dailyOld: [] };
+
+      const now = Date.now();
+      const cutoff24h = now - 24 * 3600 * 1000;
+      const cutoff30d = now - 30 * 24 * 3600 * 1000;
+
+      // 1. Sessions expirées
+      addLog('── Sessions multijoueur ──');
+      try {
+        const sessSnap = await get(ref(db, 'sessions'));
+        if (sessSnap.exists()) {
+          const sessions = sessSnap.val();
+          let total = 0, expired = 0, totalSize = 0;
+          for (const [code, sess] of Object.entries(sessions)) {
+            total++;
+            const size = JSON.stringify(sess).length;
+            totalSize += size;
+            if (sess.createdAt && sess.createdAt < cutoff24h) {
+              expired++;
+              auditResult.sessions.push(code);
+              addLog(`  ❌ ${code} — créée il y a ${((now - sess.createdAt) / 3600000).toFixed(1)}h (${(size/1024).toFixed(1)} KB)`);
+            }
+          }
+          addLog(`  Total: ${total} sessions, ${expired} expirées (> 24h), ~${(totalSize/1024).toFixed(1)} KB`);
+        } else { addLog('  Aucune session'); }
+      } catch (e) { addLog(`  ❌ Erreur: ${e.message}`); }
+
+      // 2. Leaderboard en surplus
+      addLog('\n── Leaderboard ──');
+      try {
+        const lbSnap = await get(ref(db, 'leaderboard'));
+        if (lbSnap.exists()) {
+          const lb = lbSnap.val();
+          let totalEntries = 0, toDelete = 0;
+          for (const [key, scores] of Object.entries(lb)) {
+            const entries = Object.entries(scores).sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
+            totalEntries += entries.length;
+            if (entries.length > 100) {
+              const excess = entries.slice(100);
+              toDelete += excess.length;
+              for (const [id] of excess) {
+                auditResult.lbCleanup.push({ articleKey: key, id });
+              }
+              addLog(`  ⚠️ "${key}": ${entries.length} entrées → suppression de ${excess.length}`);
+            }
+          }
+          addLog(`  Total: ${totalEntries} scores, ${toDelete} en surplus`);
+        } else { addLog('  Aucun score'); }
+      } catch (e) { addLog(`  ❌ Erreur: ${e.message}`); }
+
+      // 3. Daily anciens
+      addLog('\n── Articles quotidiens ──');
+      try {
+        const dailySnap = await get(ref(db, 'daily'));
+        if (dailySnap.exists()) {
+          const daily = dailySnap.val();
+          let total = 0, old = 0;
+          for (const date of Object.keys(daily)) {
+            total++;
+            const d = new Date(date).getTime();
+            if (!isNaN(d) && d < cutoff30d) {
+              old++;
+              auditResult.dailyOld.push(date);
+              addLog(`  ❌ ${date} — plus de 30 jours`);
+            }
+          }
+          addLog(`  Total: ${total} jours, ${old} anciens (> 30 jours)`);
+        } else { addLog('  Aucun quotidien'); }
+      } catch (e) { addLog(`  ❌ Erreur: ${e.message}`); }
+
+      // Summary
+      const totalActions = auditResult.sessions.length + auditResult.lbCleanup.length + auditResult.dailyOld.length;
+      addLog(`\n══ Résumé ══`);
+      addLog(`Sessions à supprimer: ${auditResult.sessions.length}`);
+      addLog(`Scores en surplus: ${auditResult.lbCleanup.length}`);
+      addLog(`Jours anciens: ${auditResult.dailyOld.length}`);
+      addLog(`Total actions: ${totalActions}`);
+
+      statsEl.innerHTML = `
+        <span class="stat">🗑️ ${auditResult.sessions.length} sessions</span>
+        <span class="stat">📊 ${auditResult.lbCleanup.length} scores</span>
+        <span class="stat">📅 ${auditResult.dailyOld.length} jours</span>
+      `;
+
+      document.getElementById('clean-btn').disabled = totalActions === 0;
+      if (totalActions > 0) addLog(`\n✅ Cliquez "🧹 Nettoyer" pour exécuter.`);
+      else addLog(`\n✅ Rien à nettoyer ! Tout est propre.`);
+    });
+
+    document.getElementById('clean-btn').addEventListener('click', async () => {
+      if (!auditResult || !confirm('Supprimer les données identifiées ? Cette action est irréversible.')) return;
+      document.getElementById('clean-btn').disabled = true;
+      addLog('\n🧹 Nettoyage en cours...');
+
+      // 1. Delete expired sessions
+      for (const code of auditResult.sessions) {
+        try { await remove(ref(db, `sessions/${code}`)); addLog(`  ✅ Session ${code} supprimée`); }
+        catch (e) { addLog(`  ❌ Session ${code}: ${e.message}`); }
+      }
+
+      // 2. Delete excess leaderboard entries
+      for (const { articleKey, id } of auditResult.lbCleanup) {
+        try { await remove(ref(db, `leaderboard/${articleKey}/${id}`)); }
+        catch (e) { addLog(`  ❌ Score ${id}: ${e.message}`); }
+      }
+      if (auditResult.lbCleanup.length) addLog(`  ✅ ${auditResult.lbCleanup.length} scores en surplus supprimés`);
+
+      // 3. Delete old daily entries
+      for (const date of auditResult.dailyOld) {
+        try { await remove(ref(db, `daily/${date}`)); addLog(`  ✅ Daily ${date} supprimé`); }
+        catch (e) { addLog(`  ❌ Daily ${date}: ${e.message}`); }
+      }
+
+      addLog('\n🎉 Nettoyage terminé !');
+      auditResult = null;
+    });
+  </script>
+  <script src="firebase-config.js"></script>
+</body>
+</html>
