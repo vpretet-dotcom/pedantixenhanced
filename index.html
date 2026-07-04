@@ -2125,7 +2125,90 @@
         padding: .4rem .6rem
       }
     }
+
+    /* ── Ad containers (discreet, integrated) ── */
+    .ad-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: .8rem auto;
+      max-width: 336px;
+      min-height: 50px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity .6s ease;
+    }
+
+    .ad-container.ad-visible {
+      opacity: 1
+    }
+
+    .ad-container.ad-loading {
+      margin-top: 1.2rem;
+      background: rgba(255,255,255,.03);
+      border: 1px dashed rgba(255,255,255,.06);
+    }
+
+    [data-theme=light] .ad-container.ad-loading {
+      background: rgba(0,0,0,.02);
+      border-color: rgba(0,0,0,.06);
+    }
+
+    .ad-container.ad-win {
+      margin-top: 1rem;
+      padding: .3rem;
+    }
+
+    .ad-label {
+      font-size: .58rem;
+      color: var(--text-3);
+      opacity: .5;
+      text-align: center;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: .2rem;
+    }
+
+    .ad-container ins {
+      display: block;
+      width: 100%;
+    }
+
+    /* Ko-fi button */
+    .kofi-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: linear-gradient(135deg, #ff5e5b, #ff9966);
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      padding: .45rem 1rem;
+      font-family: inherit;
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+      margin-top: .6rem;
+    }
+
+    .kofi-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255,94,91,.35);
+    }
+
+    .kofi-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #fff;
+    }
   </style>
+
+  <!-- AdSense : script de vérification (nécessaire pour l'approbation Google) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6410125606135546"
+       crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -2218,6 +2301,13 @@
       <div class="loading-spinner"></div>
       <div class="overlay-title">Chargement…</div>
       <div id="loading-step" class="loading-step">Récupération de l'article Wikipédia…</div>
+      <!-- Ad: Loading screen (fills natural wait time) -->
+      <div id="ad-loading-wrap">
+        <div class="ad-label">sponsorisé</div>
+        <div class="ad-container ad-loading" id="ad-loading">
+          <!-- AdSense or ad network slot inserted here by JS -->
+        </div>
+      </div>
     </div>
   </div>
 
@@ -2241,6 +2331,13 @@
         <a id="win-wiki-link" class="win-link" href="#" target="_blank" rel="noopener">→ Voir l'article Wikipédia</a>
         <button id="win-lb-btn" class="btn btn-ghost" style="display:none">🏆 Voir le leaderboard</button>
         <button id="win-new-game-btn" class="btn btn-primary">Nouvelle partie</button>
+      </div>
+      <!-- Ad: Win screen (appears after 3s delay, player is in natural pause) -->
+      <div id="ad-win-wrap" style="display:none">
+        <div class="ad-label">sponsorisé</div>
+        <div class="ad-container ad-win" id="ad-win">
+          <!-- AdSense or ad network slot inserted here by JS -->
+        </div>
       </div>
     </div>
   </div>
@@ -3526,6 +3623,8 @@
     // ── Main game flow
     // ══════════════════════════════════════════════════════════════
     async function startGame(catIds) {
+      showLoadingAd();
+      hideWinAd();
       document.getElementById('loading-overlay').classList.remove('hidden');
       document.getElementById('win-overlay').classList.add('hidden');
       document.getElementById('title-area').innerHTML = '';
@@ -3621,6 +3720,8 @@
         document.getElementById('win-lb-btn').style.display = 'none';
         scorePublished = false;
       }, 1800);
+      // Show ad after delay (player is reading stats)
+      showWinAd();
     }
 
     function submitGuess() {
@@ -3750,6 +3851,8 @@
     }
 
     async function startDailyGame(dateKey) {
+      showLoadingAd();
+      hideWinAd();
       dailyActiveDate = dateKey;
       document.getElementById('daily-overlay').classList.add('hidden');
       document.getElementById('loading-overlay').classList.remove('hidden');
@@ -3931,6 +4034,129 @@
 
     // First load: show category selector
     openCatOverlay();
+
+    // ══════════════════════════════════════════════════════════════
+    // ── Ad Management System (Phase 1 — Discreet Monetization)
+    // ══════════════════════════════════════════════════════════════
+
+    // ── Configuration ──
+    // Replace with your actual AdSense publisher ID when approved
+    const AD_CONFIG = {
+      enabled: true,                     // Master switch
+      adsenseId: 'ca-pub-6410125606135546', // Votre Publisher ID AdSense
+      slots: {
+        loading: 'XXXXXXXXXX',           // Ad slot ID for loading screen
+        win: 'XXXXXXXXXX',               // Ad slot ID for win screen
+      },
+      winDelay: 3000,                    // ms before showing win ad
+      loadingMinDisplay: 1500,           // ms minimum ad display in loading
+    };
+
+    let _adsenseLoaded = false;
+    let _adTimers = {};
+
+    // ── Lazy load AdSense script (only when first ad is needed) ──
+    function loadAdSense() {
+      if (_adsenseLoaded || !AD_CONFIG.enabled) return Promise.resolve();
+      if (AD_CONFIG.adsenseId.includes('XXXX')) {
+        console.log('[Ads] AdSense ID not configured — running in demo mode');
+        _adsenseLoaded = true;
+        return Promise.resolve();
+      }
+      return new Promise((resolve) => {
+        const s = document.createElement('script');
+        s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AD_CONFIG.adsenseId}`;
+        s.crossOrigin = 'anonymous';
+        s.async = true;
+        s.onload = () => { _adsenseLoaded = true; resolve(); };
+        s.onerror = () => { console.warn('[Ads] AdSense failed to load'); resolve(); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // ── Create an ad unit inside a container ──
+    function createAdUnit(containerId, slotId, format = 'auto') {
+      if (!AD_CONFIG.enabled) return;
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      // Clear previous ad
+      container.innerHTML = '';
+
+      if (AD_CONFIG.adsenseId.includes('XXXX')) {
+        // Demo mode: show a subtle placeholder
+        container.innerHTML = `
+          <div style="width:100%;padding:1.2rem;text-align:center;border-radius:8px;
+            background:rgba(99,102,241,.06);border:1px dashed rgba(99,102,241,.15)">
+            <div style="font-size:.7rem;color:var(--text-3);opacity:.6">Espace publicitaire</div>
+            <div style="font-size:.62rem;color:var(--text-3);opacity:.4;margin-top:.2rem">Configurez votre AdSense ID</div>
+          </div>`;
+        // Fade in
+        setTimeout(() => container.classList.add('ad-visible'), 100);
+        return;
+      }
+
+      // Real AdSense unit
+      const ins = document.createElement('ins');
+      ins.className = 'adsbygoogle';
+      ins.style.display = 'block';
+      ins.dataset.adClient = AD_CONFIG.adsenseId;
+      ins.dataset.adSlot = slotId;
+      ins.dataset.adFormat = format;
+      ins.dataset.fullWidthResponsive = 'true';
+      container.appendChild(ins);
+
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.warn('[Ads] AdSense push error:', e);
+      }
+
+      // Fade in
+      setTimeout(() => container.classList.add('ad-visible'), 200);
+    }
+
+    // ── Show ad in loading overlay ──
+    function showLoadingAd() {
+      if (!AD_CONFIG.enabled) return;
+      const wrap = document.getElementById('ad-loading-wrap');
+      if (wrap) wrap.style.display = '';
+      loadAdSense().then(() => {
+        createAdUnit('ad-loading', AD_CONFIG.slots.loading, 'rectangle');
+      });
+    }
+
+    // ── Hide loading ad ──
+    function hideLoadingAd() {
+      const container = document.getElementById('ad-loading');
+      if (container) container.classList.remove('ad-visible');
+    }
+
+    // ── Show ad in win overlay (with delay) ──
+    function showWinAd() {
+      if (!AD_CONFIG.enabled) return;
+      clearTimeout(_adTimers.win);
+      const wrap = document.getElementById('ad-win-wrap');
+      if (!wrap) return;
+      // Delay: let the player enjoy the victory first
+      _adTimers.win = setTimeout(() => {
+        wrap.style.display = '';
+        loadAdSense().then(() => {
+          createAdUnit('ad-win', AD_CONFIG.slots.win, 'rectangle');
+        });
+      }, AD_CONFIG.winDelay);
+    }
+
+    // ── Hide win ad ──
+    function hideWinAd() {
+      clearTimeout(_adTimers.win);
+      const wrap = document.getElementById('ad-win-wrap');
+      if (wrap) wrap.style.display = 'none';
+      const container = document.getElementById('ad-win');
+      if (container) { container.classList.remove('ad-visible'); container.innerHTML = ''; }
+    }
+
+    console.log('[Ads] Ad system initialized (Phase 1 — loading + win)');
   </script>
 
   <!-- ══════ SEO: Crawlable content section (visible to search engines) ══════ -->
@@ -4001,6 +4227,14 @@
 
   <!-- ══════ SEO: Semantic Footer ══════ -->
   <footer style="max-width:800px;margin:0 auto 2rem;padding:0 1.5rem;text-align:center" role="contentinfo">
+    <!-- Ko-fi support button -->
+    <div style="margin-bottom:1.2rem">
+      <a href="https://ko-fi.com/pedantix" target="_blank" rel="noopener" class="kofi-btn" id="kofi-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/></svg>
+        ☕ Offrir un café
+      </a>
+    </div>
+
     <nav aria-label="Liens utiles" style="margin-bottom:1rem">
       <p style="font-size:.78rem;color:var(--text-3);line-height:1.8">
         <strong style="color:var(--text-2)">Pedantix</strong> — Jeu de mots gratuit basé sur Wikipédia |  
@@ -4011,13 +4245,12 @@
       </p>
     </nav>
     <p style="font-size:.72rem;color:var(--text-3);line-height:1.6">
-      Pedantix est un jeu indépendant gratuit et open source. Données issues de Wikipédia sous licence
+      Pedantix est un jeu indépendant gratuit. Données issues de Wikipédia sous licence
       <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:var(--text-3)" rel="noopener">CC BY-SA 4.0</a>.
-      Pas de cookies, pas de publicité, pas de tracking.
+      Ce site utilise des publicités discrètes pour couvrir les frais d'hébergement.
     </p>
     <p style="font-size:.68rem;color:var(--text-3);margin-top:.5rem">
       © 2024-2026 Pedantix. Jeu de devinettes de mots cachés sur les articles Wikipédia.
-      Alternative gratuite au pedantix original (certitudes.org). Jouer à pedantix en ligne gratuitement.
     </p>
   </footer>
 </body>
