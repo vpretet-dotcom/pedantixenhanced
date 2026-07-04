@@ -1,0 +1,213 @@
+/* ══════════════════════════════════════
+   Pedantix — Responsive (Mobile)
+   ══════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════════
+   ── MOBILE RESPONSIVE (≤768px)
+   ═══════════════════════════════════════════════════════════ */
+@media(max-width:768px) {
+
+  /* ── Header: vertical stack ── */
+  .header {
+    flex-direction: column;
+    padding: .5rem .6rem .4rem;
+    gap: .35rem;
+    position: sticky;
+    top: 0;
+  }
+
+  .header > div:first-child {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-center {
+    width: 100%;
+    gap: .2rem;
+  }
+
+  .input-row { max-width: 100%; }
+
+  .guess-input {
+    font-size: .88rem;
+    padding: .55rem .7rem;
+    min-height: 42px;
+  }
+
+  .btn-primary {
+    min-height: 42px;
+    padding: .5rem .9rem;
+  }
+
+  .stats-row {
+    gap: .6rem;
+    font-size: .68rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ── Header actions: scrollable row ── */
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+    gap: .3rem;
+    flex-wrap: wrap;
+  }
+
+  .header-actions .btn {
+    font-size: .72rem;
+    padding: .35rem .55rem;
+    min-height: 36px;
+  }
+
+  /* ── Main layout: single column ── */
+  .main {
+    grid-template-columns: 1fr;
+    padding: .6rem .5rem;
+    gap: .6rem;
+  }
+
+  /* ── Article card ── */
+  .article-card {
+    padding: .9rem .8rem;
+    border-radius: var(--radius-md);
+  }
+
+  .article-title-area {
+    font-size: 1.1rem;
+    line-height: 2.2;
+    padding-bottom: .8rem;
+    margin-bottom: .8rem;
+  }
+
+  .article-body {
+    font-size: .85rem;
+    line-height: 2.3;
+    word-spacing: 2px;
+  }
+
+  .article-body p { margin-bottom: 1.2rem; }
+
+  .section-title {
+    font-size: .8rem;
+    margin: 1.2rem 0 .6rem;
+    padding: .3rem 0 .3rem .6rem;
+  }
+
+  .section-title.h3 {
+    margin-left: .6rem;
+    font-size: .74rem;
+  }
+
+  /* ── Word blocks on mobile ── */
+  .word-block { height: 1.1em; margin: 0 1px; }
+  .word-block.hidden { font-size: .6rem; margin-bottom: 1.2em; min-width: 18px; min-height: 18px; }
+  .word-block.hidden::after { font-size: 7px; }
+  .word-block.revealed { font-size: .8rem; padding: 1px 4px; }
+  .word-block.stopword { font-size: .76rem; }
+  .word-block.title-block { height: 1.15em; }
+
+  /* ── Sidebar: below article ── */
+  .sidebar { position: static; max-height: 250px; border-radius: var(--radius-md); padding: .8rem; }
+  .sidebar-header { margin-bottom: .5rem; padding-bottom: .5rem; }
+  .guess-item { padding: .3rem .4rem; gap: .35rem; }
+  .guess-word { font-size: .8rem; }
+  .guess-num { font-size: .62rem; }
+  .guess-badge { font-size: .6rem; padding: .08rem .3rem; }
+  .guess-prox-pct { font-size: .66rem; min-width: 2.5rem; }
+
+  /* ── Overlays: full-screen on mobile ── */
+  .overlay-card { padding: 1.5rem 1.2rem; max-width: 100%; width: 96%; border-radius: var(--radius-lg); }
+  .overlay-title { font-size: 1.2rem; }
+  .win-emoji { font-size: 2.2rem; margin-bottom: .5rem; }
+  .win-article-title { font-size: .95rem; }
+  .win-stats { font-size: .8rem; }
+  .win-actions { gap: .5rem; }
+  .win-actions .btn { min-height: 42px; font-size: .82rem; }
+  .win-pseudo-input { width: 140px; font-size: .82rem; padding: .4rem .6rem; }
+
+  /* ── Category overlay ── */
+  .cat-card { padding: 1.2rem 1rem 1rem; border-radius: var(--radius-lg); max-height: 95vh; width: 98%; }
+  .cat-header h2 { font-size: 1.15rem; }
+  .cat-header p { font-size: .78rem; }
+  .cat-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: .45rem; }
+  .cat-item { padding: .65rem .6rem .55rem; border-radius: 10px; }
+  .cat-icon { font-size: 1.3rem; margin-bottom: .3rem; }
+  .cat-name { font-size: .78rem; }
+  .cat-desc { font-size: .63rem; }
+  .cat-actions .btn { min-width: 110px; min-height: 42px; font-size: .8rem; }
+  .diff-row { flex-wrap: wrap; }
+  .diff-btn { font-size: .78rem; padding: .6rem .5rem; min-height: 52px; }
+
+  /* ── Colab overlay ── */
+  .colab-card { padding: 1.2rem 1rem; border-radius: var(--radius-lg); max-height: 95vh; width: 98%; }
+  .colab-modes { grid-template-columns: 1fr; gap: .5rem; }
+
+  /* ── Daily overlay ── */
+  .daily-card { padding: 1.2rem 1rem; width: 98%; }
+
+  /* ── Leaderboard overlay ── */
+  .lb-card { padding: 1.2rem 1rem; width: 98%; max-height: 95vh; }
+
+  /* ── Session indicator ── */
+  .session-code-display { font-size: .72rem; padding: .15rem .45rem; }
+
+  /* ── Toast ── */
+  .toast { top: auto; bottom: 12px; font-size: .78rem; padding: .35rem .8rem; max-width: 85vw; }
+
+  /* ── SEO section ── */
+  #seo-content { padding: 0 .8rem !important; }
+  #seo-content > div { padding: 1.2rem !important; border-radius: 12px !important; }
+
+  /* ── Footer ── */
+  footer { padding: 0 .8rem !important; }
+
+  /* ── Ad containers on mobile ── */
+  .ad-container { max-width: 300px; }
+  .ad-container.ad-loading { margin-top: .8rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ── SMALL PHONES (≤480px)
+   ═══════════════════════════════════════════════════════════ */
+@media(max-width:480px) {
+  .header { padding: .4rem .4rem .3rem; }
+  .logo { font-size: 1rem; }
+  .logo-badge { font-size: .5rem; padding: .1rem .35rem; }
+  .input-row { gap: .3rem; }
+  .guess-input { font-size: .82rem; padding: .5rem .6rem; }
+  .stats-row { font-size: .62rem; gap: .4rem; }
+  .header-actions .btn { font-size: .66rem; padding: .3rem .4rem; }
+  .article-card { padding: .7rem .6rem; }
+  .article-title-area { font-size: .95rem; line-height: 2; }
+  .article-body { font-size: .8rem; line-height: 2.1; }
+  .word-block.hidden { font-size: .55rem; min-width: 16px; min-height: 16px; margin-bottom: 1em; }
+  .word-block.revealed { font-size: .74rem; }
+  .word-block.stopword { font-size: .72rem; }
+  .sidebar { max-height: 200px; padding: .6rem; }
+  .overlay-card { padding: 1.2rem .8rem; }
+  .win-emoji { font-size: 1.8rem; }
+  .overlay-title { font-size: 1.05rem; }
+  .cat-card { padding: 1rem .7rem .8rem; }
+  .cat-header h2 { font-size: 1rem; }
+  .cat-grid { grid-template-columns: repeat(2, 1fr); gap: .35rem; }
+  .cat-item { padding: .5rem .45rem .4rem; }
+  .cat-icon { font-size: 1.1rem; }
+  .cat-name { font-size: .72rem; }
+  .cat-desc { font-size: .58rem; }
+  .diff-btn { font-size: .72rem; padding: .5rem .4rem; min-height: 48px; }
+  .kofi-btn { font-size: .72rem; padding: .4rem .8rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ── TOUCH DEVICE ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════ */
+@media(hover: none) and (pointer: coarse) {
+  .btn { min-height: 40px; }
+  .cat-item { min-height: 54px; }
+  .cat-item:hover { transform: none; }
+  .btn-primary:hover { transform: none; }
+  .kofi-btn:hover { transform: none; box-shadow: none; }
+  .word-block.hidden:hover { filter: none; }
+  .guess-item:hover { background: transparent; }
+}

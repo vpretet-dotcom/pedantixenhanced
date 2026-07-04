@@ -1,0 +1,182 @@
+/* ══════════════════════════════════════
+   Pedantix — UI Components
+   ══════════════════════════════════════ */
+
+/* ── Buttons ── */
+.btn {
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: .88rem;
+  padding: .5rem 1.1rem;
+  transition: all .2s ease;
+  white-space: nowrap
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff
+}
+
+.btn-primary:hover {
+  background: #4f52d4;
+  transform: translateY(-1px)
+}
+
+.btn-primary:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--border);
+  color: var(--text-2)
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, .08);
+  color: var(--text-1)
+}
+
+.btn-danger {
+  background: rgba(239, 68, 68, .15);
+  border: 1px solid rgba(239, 68, 68, .3);
+  color: #fca5a5
+}
+
+.btn-danger:hover {
+  background: rgba(239, 68, 68, .25)
+}
+
+.btn-icon {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  padding: .38rem .6rem;
+  font-size: .95rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm)
+}
+
+.btn-icon:hover {
+  color: var(--text-1);
+  border-color: var(--border-accent)
+}
+
+.btn-surprise {
+  background: linear-gradient(135deg, #f97316, #ef4444) !important;
+  color: #fff !important;
+  border: none !important
+}
+
+.btn-surprise:hover {
+  opacity: .88;
+  transform: translateY(-1px) !important
+}
+
+.btn-publish {
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+}
+
+.btn-publish:hover {
+  opacity: .88;
+  transform: translateY(-1px)
+}
+
+.btn-publish:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  transform: none
+}
+
+.btn-daily {
+  background: linear-gradient(135deg, #f59e0b, #ef4444) !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 700 !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-daily::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .15), transparent);
+  animation: dailyShine 3s ease-in-out infinite;
+}
+
+@keyframes dailyShine {
+  0%, 100% { transform: translateX(-100%) }
+  50% { transform: translateX(100%) }
+}
+
+.btn-daily:hover {
+  opacity: .88;
+  transform: translateY(-1px) !important
+}
+
+/* ── Inputs ── */
+.guess-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  color: var(--text-1);
+  padding: .5rem .9rem;
+  font-size: .95rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition)
+}
+
+.guess-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, .15)
+}
+
+.guess-input::placeholder {
+  color: var(--text-3)
+}
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: .42rem 1rem;
+  font-size: .84rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+  opacity: 0;
+  transition: opacity .22s, transform .22s;
+  pointer-events: none;
+  z-index: 300;
+  white-space: nowrap
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0)
+}
+
+/* ── Score published badge ── */
+.score-published {
+  color: var(--success);
+  font-size: .82rem;
+  font-weight: 600;
+  margin-top: .4rem;
+  animation: fadeIn .3s ease;
+}

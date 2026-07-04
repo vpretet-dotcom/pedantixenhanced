@@ -1,0 +1,73 @@
+/* ══════════════════════════════════════
+   Pedantix — Ads & Ko-fi
+   ══════════════════════════════════════ */
+
+/* ── Ad containers (discreet, integrated) ── */
+.ad-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: .8rem auto;
+  max-width: 336px;
+  min-height: 50px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+
+.ad-container.ad-visible { opacity: 1 }
+
+.ad-container.ad-loading {
+  margin-top: 1.2rem;
+  background: rgba(255,255,255,.03);
+  border: 1px dashed rgba(255,255,255,.06);
+}
+
+[data-theme=light] .ad-container.ad-loading {
+  background: rgba(0,0,0,.02);
+  border-color: rgba(0,0,0,.06);
+}
+
+.ad-container.ad-win {
+  margin-top: 1rem;
+  padding: .3rem;
+}
+
+.ad-label {
+  font-size: .58rem;
+  color: var(--text-3);
+  opacity: .5;
+  text-align: center;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: .2rem;
+}
+
+.ad-container ins { display: block; width: 100%; }
+
+/* ── Ko-fi button ── */
+.kofi-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: linear-gradient(135deg, #ff5e5b, #ff9966);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: .45rem 1rem;
+  font-family: inherit;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  margin-top: .6rem;
+}
+
+.kofi-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255,94,91,.35);
+}
+
+.kofi-btn svg { width: 18px; height: 18px; fill: #fff; }

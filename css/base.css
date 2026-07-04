@@ -1,0 +1,67 @@
+/* ══════════════════════════════════════
+   Pedantix — Base Reset & Typography
+   ══════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box
+}
+
+html {
+  scroll-behavior: smooth
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background .35s, color .35s
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 80% 60% at 15% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 60%)
+}
+
+[data-theme=light] body::before {
+  opacity: .45
+}
+
+/* ── Animations (shared) ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px) }
+  to { opacity: 1; transform: translateY(0) }
+}
+
+@keyframes codeAppear {
+  from { opacity: 0; transform: scale(.7) }
+  to { opacity: 1; transform: scale(1) }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg) }
+}
+
+/* ── Punctuation ── */
+.punct-token {
+  color: var(--punct);
+  user-select: none;
+  vertical-align: middle
+}
+
+/* ── Confetti canvas ── */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 600;
+  display: none
+}
