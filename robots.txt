@@ -4,6 +4,9 @@
 User-agent: *
 Allow: /
 Disallow: /firebase-config.js
+Disallow: /admin-cleanup.html
+Disallow: /doc-technique.html
+Disallow: /firebase.rules.json
 
 # Sitemap
 Sitemap: https://pedentixenhanced.com/sitemap.xml
