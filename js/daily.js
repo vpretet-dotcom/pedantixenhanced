@@ -6,6 +6,7 @@ import { getFirebase } from './firebase.js';
 import { formatTime } from './timer.js';
 import { fetchMostViewed, fetchArticleByTitle } from './wiki.js';
 import { renderLeaderboard } from './leaderboard.js';
+import { escHtml } from './ui.js';
 
 export function getParisDate(offset = 0) {
   const now = new Date();
@@ -47,7 +48,15 @@ export async function loadOrCreateDailyArticle(dateKey) {
   try {
     fb = await getFirebase();
     const snap = await fb.get(fb.ref(fb.db, `daily/${dateKey}/article`));
-    if (snap.exists()) return snap.val();
+    if (snap.exists()) {
+      const stored = snap.val();
+      // If extract is stored (legacy), use it directly. Otherwise re-fetch from Wikipedia.
+      if (stored.extract) return stored;
+      if (stored.title) {
+        const art = await fetchArticleByTitle(stored.title);
+        if (art) return art;
+      }
+    }
   } catch (e) {
     console.warn('Firebase daily read failed:', e.message);
   }
@@ -62,7 +71,7 @@ export async function loadOrCreateDailyArticle(dateKey) {
     try {
       const art = await fetchArticleByTitle(pool[idx].title);
       if (art) {
-        if (fb) { try { await fb.set(fb.ref(fb.db, `daily/${dateKey}/article`), { title: art.title, extract: art.extract, url: art.url, createdAt: Date.now() }); } catch (e) { } }
+        if (fb) { try { await fb.set(fb.ref(fb.db, `daily/${dateKey}/article`), { title: art.title, url: art.url, createdAt: Date.now() }); } catch (e) { } }
         return { title: art.title, extract: art.extract, url: art.url };
       }
     } catch (e) { continue; }
@@ -114,11 +123,11 @@ export async function renderDailyOverlay() {
       <div class="daily-status-done">
         <p>✅ Déjà complété !</p>
         <p style="font-size:.78rem;color:var(--text-2);margin-top:.3rem">
-          ${result.pseudo || 'Anonyme'} — ⏱ ${formatTime(result.time)} — ${result.guesses} essais — Score: <strong style="color:var(--accent)">${result.score}</strong>
+          ${escHtml(result.pseudo || 'Anonyme')} — ⏱ ${formatTime(result.time)} — ${result.guesses} essais — Score: <strong style="color:var(--accent)">${result.score}</strong>
         </p>
       </div>
       <div class="daily-play-row">
-        <button class="btn btn-ghost" onclick="startDailyGame('${dateKey}')">🔁 Rejouer (hors classement)</button>
+        <button class="btn btn-ghost daily-play-btn" data-datekey="${dateKey}">🔁 Rejouer (hors classement)</button>
       </div>`;
   } else {
     statusEl.innerHTML = `
@@ -126,9 +135,15 @@ export async function renderDailyOverlay() {
         ${isToday ? 'Jouez la page du jour et comparez-vous aux autres !' : 'Vous avez manqué la page d\'hier ? Rattrapez-vous !'}
       </p>
       <div class="daily-play-row">
-        <button class="btn btn-primary" onclick="startDailyGame('${dateKey}')" style="font-size:.9rem">▶️ Jouer ${isToday ? 'le quotidien' : 'la page d\'hier'}</button>
+        <button class="btn btn-primary daily-play-btn" data-datekey="${dateKey}" style="font-size:.9rem">▶️ Jouer ${isToday ? 'le quotidien' : 'la page d\'hier'}</button>
       </div>`;
   }
+  // Bind click via addEventListener instead of inline onclick (CSP-safe)
+  statusEl.querySelectorAll('.daily-play-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.startDailyGame) window.startDailyGame(btn.dataset.datekey);
+    });
+  });
 
   const lbEl = document.getElementById('daily-lb-content');
   lbEl.innerHTML = '<div class="lb-empty" style="font-style:normal">Chargement...</div>';
