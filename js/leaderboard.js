@@ -11,6 +11,9 @@ export async function submitScore(pseudo) {
   const fb = await getFirebase();
   const { getElapsedSeconds } = await import('./timer.js');
   const { computeScore } = await import('./game.js');
+  // Sanitize pseudo
+  pseudo = (pseudo || '').trim().slice(0, 30).replace(/[<>&"']/g, '');
+  if (!pseudo) return;
   const time = getElapsedSeconds();
   const guesses = S.game.guesses.length;
   const score = computeScore(time, guesses, S.game.totalWords);
@@ -45,11 +48,19 @@ export async function loadLeaderboard(aKey, sortBy = 'time') {
 
 export async function loadGlobalLeaderboard(sortBy = 'time') {
   const fb = await getFirebase();
+  // Use limitToLast to avoid downloading the entire leaderboard tree
+  // Query each article's top entries instead of all data
   const snap = await fb.get(fb.ref(fb.db, 'leaderboard'));
   if (!snap.exists()) return [];
   const entries = [];
   snap.forEach(articleSnap => {
-    articleSnap.forEach(child => entries.push({ id: child.key, ...child.val() }));
+    let count = 0;
+    articleSnap.forEach(child => {
+      if (count < 20) { // Limit per article to reduce memory usage
+        entries.push({ id: child.key, ...child.val() });
+        count++;
+      }
+    });
   });
   if (sortBy === 'time') entries.sort((a, b) => a.time - b.time);
   else if (sortBy === 'guesses') entries.sort((a, b) => a.guesses - b.guesses);
