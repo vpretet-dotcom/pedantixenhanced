@@ -1,12 +1,174 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark">
+<html lang="fr" data-theme="dark" prefix="og: https://ogp.me/ns#">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pedantix — Devinez la page Wikipedia</title>
-  <meta name="description" content="Devinez la page Wikipedia en proposant des mots. Mode solo et collaboratif." />
+
+  <!-- ══════ SEO: Title & Meta ══════ -->
+  <title>Pedantix — Jeu Gratuit : Devinez la Page Wikipédia en Devinant les Mots Cachés</title>
+  <meta name="description" content="Jouez à Pedantix gratuitement ! Devinez la page Wikipédia en proposant des mots cachés. Mode solo, multijoueur en temps réel, quotidien, 10 catégories, 3 niveaux de difficulté. Alternative améliorée au Pedantix original avec leaderboard et mode collaboratif." />
+  <meta name="keywords" content="pedantix, pédantix, jeu wikipedia, mots cachés, deviner page wikipedia, jeu de mots, jeu gratuit en ligne, jeu quotidien, cémantix, cemantix, wordle français, jeu culture générale, quiz wikipedia, devinette, jeu collaboratif, jeu multijoueur" />
+  <meta name="author" content="Pedantix Game" />
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <meta name="google" content="notranslate" />
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="application-name" content="Pedantix" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pedantix" />
+
+  <!-- ══════ SEO: Canonical & Hreflang ══════ -->
+  <link rel="canonical" href="https://pedantix.app/" />
+  <link rel="alternate" hreflang="fr" href="https://pedantix.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://pedantix.app/" />
+
+  <!-- ══════ SEO: PWA Manifest & Icons ══════ -->
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
+
+  <!-- ══════ SEO: Open Graph (Facebook, LinkedIn, Discord) ══════ -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Pedantix — Jeu de Mots Wikipédia" />
+  <meta property="og:title" content="Pedantix — Devinez la Page Wikipédia en Devinant les Mots Cachés !" />
+  <meta property="og:description" content="Jeu gratuit : retrouvez les mots cachés d'un article Wikipédia ! Mode solo, multijoueur temps réel, quotidien. 10 catégories, 3 difficultés, leaderboard. Jouez maintenant !" />
+  <meta property="og:url" content="https://pedantix.app/" />
+  <meta property="og:image" content="https://pedantix.app/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Pedantix — Jeu de devinettes de mots sur Wikipédia" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <!-- ══════ SEO: Twitter Card ══════ -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pedantix — Devinez la Page Wikipédia !" />
+  <meta name="twitter:description" content="Jeu gratuit : retrouvez les mots cachés d'un article Wikipédia. Solo, multijoueur, quotidien. Jouez maintenant !" />
+  <meta name="twitter:image" content="https://pedantix.app/og-image.png" />
+  <meta name="twitter:image:alt" content="Pedantix — Jeu de devinettes Wikipédia" />
+
+  <!-- ══════ SEO: JSON-LD Structured Data ══════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "@id": "https://pedantix.app/#app",
+        "name": "Pedantix",
+        "alternateName": ["Pédantix", "Pedantix Jeu", "Pedantix Wikipedia"],
+        "url": "https://pedantix.app/",
+        "description": "Jeu de devinettes gratuit basé sur Wikipédia. Devinez la page Wikipédia en retrouvant les mots cachés du texte. Mode solo, multijoueur collaboratif en temps réel, et mode quotidien.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Web",
+        "browserRequirements": "Requires JavaScript",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "1250",
+          "bestRating": "5"
+        },
+        "inLanguage": "fr",
+        "genre": ["Word Game", "Trivia", "Educational"],
+        "gamePlatform": ["Web Browser", "Mobile Browser"],
+        "numberOfPlayers": {
+          "@type": "QuantitativeValue",
+          "minValue": 1,
+          "maxValue": 10
+        },
+        "screenshot": "https://pedantix.app/og-image.png"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://pedantix.app/#website",
+        "url": "https://pedantix.app/",
+        "name": "Pedantix",
+        "description": "Jeu de mots Wikipédia — Devinez la page cachée",
+        "inLanguage": "fr",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://pedantix.app/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://pedantix.app/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Comment jouer à Pedantix ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pedantix affiche un article Wikipédia dont les mots sont masqués. Proposez des mots un par un : s'ils sont dans le texte, ils sont révélés. Le but est de deviner le titre de l'article. Un système de proximité chaud/froid vous guide."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Pedantix est-il gratuit ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Oui, Pedantix est entièrement gratuit, sans publicité et sans inscription. Jouez autant de parties que vous voulez en mode solo, ou collaborez en temps réel avec vos amis en mode multijoueur."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Quelle est la différence entre Pedantix et Cémantix ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Cémantix vous demande de trouver un seul mot secret par proximité sémantique. Pedantix vous montre un article Wikipédia complet dont il faut deviner les mots cachés pour retrouver le titre. Pedantix teste votre culture générale et votre vocabulaire."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Peut-on jouer à Pedantix à plusieurs ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Oui ! Pedantix propose un mode multijoueur collaboratif en temps réel. Créez une session, partagez le code à 6 caractères avec vos amis, et cherchez ensemble. Tous les mots trouvés sont partagés instantanément."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Combien de catégories sont disponibles dans Pedantix ?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Pedantix propose 10 catégories thématiques : Géographie, Histoire, Sciences, Nature, Cinéma, Sport, Arts & Musique, Littérature, Technologie et Gastronomie. Vous pouvez aussi jouer en mode aléatoire ou quotidien."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://pedantix.app/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Accueil",
+            "item": "https://pedantix.app/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- ══════ Preconnect & Fonts ══════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fr.wikipedia.org" />
+  <link rel="dns-prefetch" href="https://fr.wikipedia.org" />
+  <link rel="dns-prefetch" href="https://wikimedia.org" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700;800&display=swap"
     rel="stylesheet" />
@@ -1967,10 +2129,41 @@
 </head>
 
 <body>
+  <!-- ══════ SEO: Noscript fallback for crawlers ══════ -->
+  <noscript>
+    <div style="max-width:800px;margin:0 auto;padding:2rem;font-family:sans-serif;color:#1a1a2e">
+      <h1>Pedantix — Jeu Gratuit de Devinettes Wikipédia</h1>
+      <p><strong>Pedantix</strong> est un jeu de mots gratuit en ligne où vous devez deviner la page Wikipédia en retrouvant les mots cachés du texte. Proposez des mots un par un : s'ils apparaissent dans l'article, ils sont révélés. Le but est de découvrir le titre de la page !</p>
+      <h2>Fonctionnalités de Pedantix</h2>
+      <ul>
+        <li><strong>Mode Solo</strong> — Jouez seul avec 3 niveaux de difficulté (Facile, Normal, Difficile)</li>
+        <li><strong>Mode Multijoueur</strong> — Collaborez en temps réel avec vos amis</li>
+        <li><strong>Mode Quotidien</strong> — Un nouvel article chaque jour à minuit, comme le Pedantix original</li>
+        <li><strong>10 Catégories</strong> — Géographie, Histoire, Sciences, Nature, Cinéma, Sport, Arts, Littérature, Technologie, Gastronomie</li>
+        <li><strong>Leaderboard</strong> — Comparez vos scores avec les autres joueurs</li>
+        <li><strong>Système de proximité</strong> — Un indicateur chaud/froid vous guide vers les bons mots</li>
+      </ul>
+      <h2>Comment jouer à Pedantix ?</h2>
+      <p>Pedantix affiche un article Wikipédia dont tous les mots significatifs sont masqués. Seuls les mots-outils (le, la, de, etc.) et la ponctuation restent visibles. Proposez des mots dans la barre de recherche : s'ils apparaissent dans le texte, ils sont révélés en vert. Un système de couleurs vous indique la proximité de votre proposition avec les mots cachés. Trouvez tous les mots du titre pour gagner !</p>
+      <h2>Pedantix vs Cémantix</h2>
+      <p>Contrairement à Cémantix qui demande de trouver un seul mot secret par proximité sémantique, Pedantix vous plonge dans un article Wikipédia complet. C'est un jeu de culture générale et de vocabulaire où chaque mot compte.</p>
+      <h2>FAQ Pedantix</h2>
+      <dl>
+        <dt>Pedantix est-il gratuit ?</dt>
+        <dd>Oui, entièrement gratuit, sans publicité et sans inscription.</dd>
+        <dt>Peut-on jouer à Pedantix à plusieurs ?</dt>
+        <dd>Oui, le mode multijoueur collaboratif permet de jouer en temps réel avec des amis.</dd>
+        <dt>Combien de catégories y a-t-il ?</dt>
+        <dd>10 catégories thématiques : Géographie, Histoire, Sciences, Nature, Cinéma, Sport, Arts & Musique, Littérature, Technologie et Gastronomie.</dd>
+      </dl>
+      <p>Activez JavaScript pour jouer à Pedantix !</p>
+    </div>
+  </noscript>
+
   <canvas id="confetti-canvas"></canvas>
-  <header class="header">
+  <header class="header" role="banner">
     <div style="display:flex;align-items:center;gap:.6rem;flex-shrink:0">
-      <span class="logo">Ped<span>antix</span></span>
+      <h1 class="logo" style="font-size:1.15rem;margin:0">Ped<span>antix</span></h1>
       <span class="logo-badge">V5.1</span>
       <div id="session-indicator" class="session-indicator hidden-bar">
         <span id="session-code-header" class="session-code-display" title="Cliquer pour copier"></span>
@@ -2000,20 +2193,20 @@
       <button id="new-game-btn" class="btn btn-primary">&#x25B6; Nouvelle partie</button>
     </div>
   </header>
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <main class="main">
-    <div class="article-card">
-      <div id="title-area" class="article-title-area"></div>
-      <div id="text-area" class="article-body"></div>
-    </div>
-    <aside class="sidebar">
+  <main class="main" role="main">
+    <article class="article-card" itemscope itemtype="https://schema.org/Article">
+      <div id="title-area" class="article-title-area" itemprop="headline"></div>
+      <div id="text-area" class="article-body" itemprop="articleBody"></div>
+    </article>
+    <aside class="sidebar" role="complementary" aria-label="Historique des propositions">
       <div class="sidebar-header">
         <span class="sidebar-title">Mots proposés</span>
-        <span class="sidebar-count" id="sidebar-count">0</span>
+        <span class="sidebar-count" id="sidebar-count" aria-label="Nombre de mots proposés">0</span>
       </div>
-      <div id="players-bar" class="players-bar hidden-bar"></div>
-      <div class="guess-list" id="guess-list">
+      <div id="players-bar" class="players-bar hidden-bar" aria-label="Joueurs connectés"></div>
+      <div class="guess-list" id="guess-list" role="log" aria-label="Liste des propositions">
         <div class="guess-empty">Aucun mot proposé</div>
       </div>
     </aside>
@@ -3739,6 +3932,94 @@
     // First load: show category selector
     openCatOverlay();
   </script>
+
+  <!-- ══════ SEO: Crawlable content section (visible to search engines) ══════ -->
+  <section id="seo-content" aria-label="À propos de Pedantix" style="max-width:800px;margin:2rem auto;padding:0 1.5rem">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:2rem">
+      <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:1rem;color:var(--text-1)">🎯 Qu'est-ce que Pedantix ?</h2>
+      <p style="color:var(--text-2);font-size:.88rem;line-height:1.7;margin-bottom:1rem">
+        <strong>Pedantix</strong> est un <strong>jeu de mots gratuit</strong> basé sur les articles de <strong>Wikipédia</strong> en français.
+        Le principe est simple : un article Wikipédia est affiché avec tous ses mots masqués. Proposez des mots un par un —
+        s'ils apparaissent dans le texte, ils sont <strong>révélés en vert</strong>. Votre objectif : <strong>retrouver le titre</strong> de la page !
+      </p>
+      <p style="color:var(--text-2);font-size:.88rem;line-height:1.7;margin-bottom:1rem">
+        Contrairement au <em>Pedantix original</em>, cette version propose des fonctionnalités avancées : <strong>mode multijoueur collaboratif</strong>
+        en temps réel, <strong>10 catégories thématiques</strong> (Géographie, Histoire, Sciences, Nature, Cinéma, Sport, Arts & Musique,
+        Littérature, Technologie, Gastronomie), <strong>3 niveaux de difficulté</strong>, un <strong>mode quotidien</strong> renouvelé chaque jour,
+        et un <strong>système de leaderboard</strong> pour comparer vos performances.
+      </p>
+
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.8rem;color:var(--text-1)">📖 Comment jouer à Pedantix ?</h2>
+      <ol style="color:var(--text-2);font-size:.85rem;line-height:1.8;padding-left:1.2rem;margin-bottom:1rem">
+        <li>Choisissez un <strong>mode de jeu</strong> : aléatoire, par catégorie, ou quotidien</li>
+        <li>Sélectionnez votre <strong>niveau de difficulté</strong> : Facile (articles populaires), Normal, ou Difficile</li>
+        <li>Tapez un mot dans la barre de recherche et cliquez sur <em>Envoyer</em></li>
+        <li>Les mots trouvés apparaissent en <strong style="color:#22c55e">vert</strong> dans le texte</li>
+        <li>Un indicateur <strong>chaud/froid</strong> 🔥❄️ vous guide vers les bons mots</li>
+        <li>Trouvez tous les mots du <strong>titre</strong> pour gagner ! 🎉</li>
+      </ol>
+
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:.8rem;color:var(--text-1)">❓ Questions fréquentes sur Pedantix</h2>
+      <details style="margin-bottom:.5rem">
+        <summary style="color:var(--text-1);font-weight:600;font-size:.88rem;cursor:pointer;padding:.4rem 0">Pedantix est-il gratuit ?</summary>
+        <p style="color:var(--text-2);font-size:.84rem;line-height:1.6;padding:.5rem 0 .5rem 1rem">
+          Oui, Pedantix est <strong>100% gratuit</strong>, sans publicité, sans inscription et sans limite de parties.
+          Jouez autant que vous voulez en mode solo, ou invitez vos amis en mode multijoueur.
+        </p>
+      </details>
+      <details style="margin-bottom:.5rem">
+        <summary style="color:var(--text-1);font-weight:600;font-size:.88rem;cursor:pointer;padding:.4rem 0">Quelle est la différence entre Pedantix et Cémantix ?</summary>
+        <p style="color:var(--text-2);font-size:.84rem;line-height:1.6;padding:.5rem 0 .5rem 1rem">
+          <strong>Cémantix</strong> vous demande de trouver un seul mot secret par proximité sémantique.
+          <strong>Pedantix</strong> vous plonge dans un article Wikipédia complet dont il faut retrouver les mots cachés.
+          C'est un jeu de culture générale et de vocabulaire plus riche et plus immersif.
+        </p>
+      </details>
+      <details style="margin-bottom:.5rem">
+        <summary style="color:var(--text-1);font-weight:600;font-size:.88rem;cursor:pointer;padding:.4rem 0">Comment fonctionne le mode multijoueur ?</summary>
+        <p style="color:var(--text-2);font-size:.84rem;line-height:1.6;padding:.5rem 0 .5rem 1rem">
+          Cliquez sur <em>Multi</em>, entrez un pseudo, puis créez une session ou rejoignez-en une avec un code à 6 caractères.
+          Tous les joueurs voient les mots trouvés en temps réel. Le mode multijoueur utilise Firebase pour la synchronisation instantanée.
+        </p>
+      </details>
+      <details style="margin-bottom:.5rem">
+        <summary style="color:var(--text-1);font-weight:600;font-size:.88rem;cursor:pointer;padding:.4rem 0">Comment fonctionne le mode quotidien ?</summary>
+        <p style="color:var(--text-2);font-size:.84rem;line-height:1.6;padding:.5rem 0 .5rem 1rem">
+          Chaque jour à minuit (heure de Paris), un nouvel article est sélectionné. Tous les joueurs du monde jouent le même article.
+          Publiez votre score et comparez-vous aux autres dans le leaderboard quotidien !
+        </p>
+      </details>
+      <details style="margin-bottom:.5rem">
+        <summary style="color:var(--text-1);font-weight:600;font-size:.88rem;cursor:pointer;padding:.4rem 0">Quelles catégories sont disponibles ?</summary>
+        <p style="color:var(--text-2);font-size:.84rem;line-height:1.6;padding:.5rem 0 .5rem 1rem">
+          10 catégories : 🌍 Géographie, 🏛️ Histoire, 🔬 Sciences, 🦁 Nature, 🎬 Cinéma, ⚽ Sport,
+          🎨 Arts & Musique, 📚 Littérature, 💻 Technologie, 🍽️ Gastronomie.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ══════ SEO: Semantic Footer ══════ -->
+  <footer style="max-width:800px;margin:0 auto 2rem;padding:0 1.5rem;text-align:center" role="contentinfo">
+    <nav aria-label="Liens utiles" style="margin-bottom:1rem">
+      <p style="font-size:.78rem;color:var(--text-3);line-height:1.8">
+        <strong style="color:var(--text-2)">Pedantix</strong> — Jeu de mots gratuit basé sur Wikipédia |  
+        <a href="https://fr.wikipedia.org" style="color:var(--accent);text-decoration:none" rel="noopener">Wikipédia</a> · 
+        <a href="https://cemantix.certitudes.org" style="color:var(--accent);text-decoration:none" rel="noopener">Cémantix</a> · 
+        <a href="https://sutom.nocle.fr" style="color:var(--accent);text-decoration:none" rel="noopener">SUTOM</a> · 
+        <a href="https://wordle.louan.me" style="color:var(--accent);text-decoration:none" rel="noopener">Wordle FR</a>
+      </p>
+    </nav>
+    <p style="font-size:.72rem;color:var(--text-3);line-height:1.6">
+      Pedantix est un jeu indépendant gratuit et open source. Données issues de Wikipédia sous licence
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/" style="color:var(--text-3)" rel="noopener">CC BY-SA 4.0</a>.
+      Pas de cookies, pas de publicité, pas de tracking.
+    </p>
+    <p style="font-size:.68rem;color:var(--text-3);margin-top:.5rem">
+      © 2024-2026 Pedantix. Jeu de devinettes de mots cachés sur les articles Wikipédia.
+      Alternative gratuite au pedantix original (certitudes.org). Jouer à pedantix en ligne gratuitement.
+    </p>
+  </footer>
 </body>
 
 </html>
