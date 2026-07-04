@@ -46,7 +46,7 @@ export function initGame(title, extract, url) {
 
 export function guess(word) {
   if (!S.game || S.game.won) return;
-  word = word.trim(); if (!word) return;
+  word = word.trim().slice(0, 100); if (!word) return;
   if (S.game.guesses.some(g => g.word.toLowerCase() === word.toLowerCase())) return { dup: true };
   const lo = word.toLowerCase(), nm = normalize(word), lm = lemmatize(lo), lmn = normalize(lm), gv = wordVec(word);
   let found = 0, bestSim = 0, bestW = null;
