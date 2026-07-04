@@ -1,0 +1,73 @@
+{
+  "rules": {
+    "leaderboard": {
+      "$articleKey": {
+        ".read": true,
+        "$scoreId": {
+          ".write": "!data.exists()",
+          ".validate": "newData.hasChildren(['pseudo', 'time', 'guesses', 'score', 'date']) && newData.child('pseudo').isString() && newData.child('pseudo').val().length <= 30 && newData.child('pseudo').val().length >= 1 && newData.child('time').isNumber() && newData.child('time').val() >= 0 && newData.child('time').val() <= 86400 && newData.child('guesses').isNumber() && newData.child('guesses').val() >= 1 && newData.child('guesses').val() <= 50000 && newData.child('score').isNumber() && newData.child('score').val() >= 0 && newData.child('score').val() <= 100000 && newData.child('date').isNumber()"
+        }
+      }
+    },
+    "daily": {
+      "$date": {
+        ".validate": "$date.matches(/^\\d{4}-\\d{2}-\\d{2}$/)",
+        "article": {
+          ".read": true,
+          ".write": "!data.exists()"
+        },
+        "scores": {
+          ".read": true,
+          "$scoreId": {
+            ".write": "!data.exists()",
+            ".validate": "newData.hasChildren(['pseudo', 'time', 'guesses', 'score']) && newData.child('pseudo').isString() && newData.child('pseudo').val().length <= 30 && newData.child('time').isNumber() && newData.child('score').isNumber()"
+          }
+        }
+      }
+    },
+    "sessions": {
+      "$code": {
+        ".read": true,
+        ".validate": "$code.length === 6",
+        "host": {
+          ".write": "!data.exists()"
+        },
+        "status": {
+          ".write": true,
+          ".validate": "newData.isString() && (newData.val() === 'waiting' || newData.val() === 'playing' || newData.val() === 'won')"
+        },
+        "createdAt": {
+          ".write": "!data.exists()"
+        },
+        "startedAt": {
+          ".write": true
+        },
+        "players": {
+          "$playerId": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['name', 'color']) && newData.child('name').isString() && newData.child('name').val().length <= 30 && newData.child('color').isString() && newData.child('color').val().length <= 10"
+          }
+        },
+        "article": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['titleToksJSON', 'secsJSON', 'totalWords', 'url', 'title'])"
+        },
+        "guesses": {
+          "$guessId": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['word', 'found', 'playerName', 'timestamp']) && newData.child('word').isString() && newData.child('word').val().length <= 100 && newData.child('playerName').isString() && newData.child('playerName').val().length <= 30"
+          }
+        },
+        "revealed": {
+          "$norm": {
+            ".write": true,
+            ".validate": "newData.isBoolean()"
+          }
+        },
+        "config": {
+          ".write": true
+        }
+      }
+    }
+  }
+}
