@@ -26,7 +26,7 @@ export async function colabCreateSession(playerName) {
   const fb = await getFirebase();
   const code = generateCode();
   S.setColabSessionCode(code);
-  S.setColabPlayerName(playerName);
+  S.setColabPlayerName(playerName.slice(0, 30));
   S.setColabPlayerId('p_' + Math.random().toString(36).slice(2, 8));
   S.setColabPlayerColor(PLAYER_COLORS[Math.random() * PLAYER_COLORS.length | 0]);
   S.setColabMode('host');
@@ -53,7 +53,7 @@ export async function colabJoinSession(code, playerName) {
   if (!snap.exists()) throw new Error('Session introuvable');
 
   S.setColabSessionCode(code);
-  S.setColabPlayerName(playerName);
+  S.setColabPlayerName(playerName.slice(0, 30));
   S.setColabPlayerId('p_' + Math.random().toString(36).slice(2, 8));
   S.setColabPlayerColor(PLAYER_COLORS[Math.random() * PLAYER_COLORS.length | 0]);
   S.setColabMode('guest');
