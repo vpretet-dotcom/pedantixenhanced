@@ -1,0 +1,12 @@
+# Pedantix - robots.txt
+# https://pedantix.app/
+
+User-agent: *
+Allow: /
+Disallow: /firebase-config.js
+
+# Sitemap
+Sitemap: https://pedantix.app/sitemap.xml
+
+# Crawl-delay (be polite)
+Crawl-delay: 1
