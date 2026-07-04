@@ -1,9 +1,20 @@
 // ══════════════════════════════════════
 // Pedantix — Main Application Entry Point
 // ══════════════════════════════════════
+
+// ── Global error handlers (prevents silent crashes)
+window.addEventListener('unhandledrejection', e => {
+  console.error('[Pedantix] Unhandled promise rejection:', e.reason);
+  try { document.getElementById('toast') && import('./ui.js').then(m => m.showToast('⚠️ Erreur réseau, réessayez', '#f59e0b', 3000)); } catch (_) {}
+});
+window.onerror = (msg, src, line, col, err) => {
+  console.error(`[Pedantix] Error: ${msg} at ${src}:${line}:${col}`, err);
+  return false;
+};
+
 import * as S from './state.js';
 import { CATEGORIES } from './config.js';
-import { showToast, renderGame, renderGuesses, updateStats, updateGame, renderGuessItem, toastFeedback, proxColor, updatePlayersBar, updateColabPlayerList, proxTxtColor } from './ui.js';
+import { showToast, escHtml, renderGame, renderGuesses, updateStats, updateGame, renderGuessItem, toastFeedback, proxColor, updatePlayersBar, updateColabPlayerList, proxTxtColor } from './ui.js';
 import { sndFound, sndWin, sndDup, launchConfetti, cascadeTitle } from './audio.js';
 import { startTimer, stopTimer, getElapsedSeconds, formatTime, updateTimerDisplay } from './timer.js';
 import { initGame, guess, revealByNorm, computeScore, articleKey } from './game.js';
@@ -90,7 +101,7 @@ function updateCatDailyInfo() {
   const done = isDailyDone(today);
   const result = getDailyResult(today);
   if (done && result) {
-    statusEl.innerHTML = `<div class="daily-status-done"><p>✅ Déjà complété aujourd'hui !</p><p style="font-size:.78rem;color:var(--text-2);margin-top:.3rem">${result.pseudo || 'Anonyme'} — ⏱ ${formatTime(result.time)} — ${result.guesses} essais — Score: <strong style="color:var(--accent)">${result.score}</strong></p></div>`;
+    statusEl.innerHTML = `<div class="daily-status-done"><p>✅ Déjà complété aujourd'hui !</p><p style="font-size:.78rem;color:var(--text-2);margin-top:.3rem">${escHtml(result.pseudo || 'Anonyme')} — ⏱ ${formatTime(result.time)} — ${result.guesses} essais — Score: <strong style="color:var(--accent)">${result.score}</strong></p></div>`;
   } else {
     statusEl.innerHTML = '';
   }
@@ -201,7 +212,8 @@ export function handleWin() {
 
 // ── Submit guess
 function submitGuess() {
-  const inp = document.getElementById('guess-input'), w = inp.value.trim();
+  const inp = document.getElementById('guess-input');
+  const w = inp.value.trim().slice(0, 100);
   if (!w || !S.game || S.game.won) return;
   inp.value = '';
   const r = guess(w);
@@ -303,7 +315,7 @@ document.getElementById('win-pseudo-input').addEventListener('input', e => {
 });
 document.getElementById('win-publish-btn').addEventListener('click', async () => {
   if (S.scorePublished) return;
-  const pseudo = document.getElementById('win-pseudo-input').value.trim();
+  const pseudo = document.getElementById('win-pseudo-input').value.trim().slice(0, 30).replace(/[<>&"']/g, '');
   if (!pseudo) return;
   const btn = document.getElementById('win-publish-btn');
   btn.disabled = true; btn.textContent = '...';
