@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedantix Enhanced — Documentation Technique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a1a;
+      --bg-card: rgba(16, 16, 35, 0.85);
+      --bg-code: rgba(10, 10, 30, 0.95);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --accent2: #22c55e;
+      --accent3: #f59e0b;
+      --accent4: #ec4899;
+      --accent5: #06b6d4;
+      --text-1: #e8ecf4;
+      --text-2: #a0a8c0;
+      --text-3: #6b7394;
+      --border: rgba(100, 100, 180, 0.14);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+    ::selection { background: var(--accent); color: white; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);
+      padding: .4rem 1.2rem; border-radius: 100px;
+      font-size: .78rem; font-weight: 600; color: var(--accent);
+      letter-spacing: .05em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      animation: fadeInUp .6s ease-out;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      background: linear-gradient(135deg, #e8ecf4 0%, #6366f1 50%, #22c55e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      animation: fadeInUp .6s ease-out .1s both;
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--text-2); max-width: 650px;
+      margin: 0 auto 2rem;
+      animation: fadeInUp .6s ease-out .2s both;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 2.5rem; flex-wrap: wrap;
+      animation: fadeInUp .6s ease-out .3s both;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .num {
+      display: block; font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-stat .label { font-size: .78rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; }
+
+    /* ── Nav ── */
+    .toc {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,26,0.92); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: .6rem 1rem;
+      overflow-x: auto; white-space: nowrap;
+    }
+    .toc-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; gap: .4rem; align-items: center;
+    }
+    .toc a {
+      color: var(--text-3); text-decoration: none;
+      font-size: .78rem; font-weight: 500;
+      padding: .4rem .8rem; border-radius: 8px;
+      transition: all .2s;
+    }
+    .toc a:hover { color: var(--text-1); background: rgba(99,102,241,0.1); }
+
+    /* ── Container ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+    section { padding: 4rem 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    /* ── Section Headers ── */
+    .section-tag {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--accent);
+      margin-bottom: .6rem;
+    }
+    .section-tag::before {
+      content: ''; width: 24px; height: 2px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    h2 {
+      font-size: 1.8rem; font-weight: 800; letter-spacing: -.02em;
+      margin-bottom: .6rem;
+    }
+    .section-desc { color: var(--text-2); font-size: .95rem; margin-bottom: 2rem; }
+    h3 {
+      font-size: 1.15rem; font-weight: 700; margin-bottom: .8rem;
+      color: var(--text-1);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .card:hover {
+      border-color: rgba(99,102,241,0.3);
+      box-shadow: 0 0 30px rgba(99,102,241,0.06);
+    }
+    .card-header {
+      display: flex; align-items: center; gap: .8rem;
+      margin-bottom: 1rem;
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; }
+    .card-subtitle { font-size: .78rem; color: var(--text-3); margin-top: .1rem; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.2rem 1.5rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem;
+      line-height: 1.6;
+      margin: 1rem 0;
+      color: #c5cee0;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem;
+    }
+    :not(pre) > code {
+      background: rgba(99,102,241,0.1);
+      padding: .15rem .45rem;
+      border-radius: 5px;
+      color: #a5b4fc;
+    }
+    .kw { color: #c084fc; }
+    .fn { color: #67e8f9; }
+    .str { color: #86efac; }
+    .cm { color: #6b7394; font-style: italic; }
+    .num { color: #fbbf24; }
+    .op { color: #f9a8d4; }
+
+    /* ── Grid ── */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
+
+    /* ── Architecture diagram ── */
+    .arch-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .arch-row {
+      display: flex; justify-content: center; gap: 1rem;
+      margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .arch-box {
+      padding: .6rem 1.2rem;
+      border-radius: var(--radius-sm);
+      font-size: .78rem; font-weight: 600;
+      text-align: center;
+      border: 1px solid;
+      min-width: 100px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .arch-box:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .arch-box.html { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+    .arch-box.css { background: rgba(6,182,212,0.1); border-color: rgba(6,182,212,0.3); color: #67e8f9; }
+    .arch-box.js { background: rgba(250,204,21,0.1); border-color: rgba(250,204,21,0.3); color: #fde047; }
+    .arch-box.core { background: rgba(99,102,241,0.15); border-color: rgba(99,102,241,0.4); color: #a5b4fc; }
+    .arch-box.api { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #86efac; }
+    .arch-box.state { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #fcd34d; }
+    .arch-arrow {
+      text-align: center; color: var(--text-3); font-size: 1.2rem;
+      margin-bottom: 1rem; letter-spacing: .3rem;
+    }
+    .arch-label {
+      font-size: .68rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text-3); text-align: center; margin-bottom: .6rem;
+    }
+
+    /* ── Flow diagram ── */
+    .flow {
+      display: flex; align-items: center; gap: .8rem;
+      flex-wrap: wrap; margin: 1.5rem 0;
+    }
+    .flow-step {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .5rem 1rem; border-radius: var(--radius-sm);
+      font-size: .82rem; font-weight: 600;
+      background: var(--bg-card); border: 1px solid var(--border);
+    }
+    .flow-arrow { color: var(--text-3); font-size: 1.2rem; }
+
+    /* ── Table ── */
+    table {
+      width: 100%; border-collapse: collapse;
+      margin: 1.2rem 0;
+    }
+    th, td {
+      padding: .7rem 1rem; text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+    }
+    th {
+      font-weight: 700; color: var(--text-2);
+      font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    tr:hover td { background: rgba(99,102,241,0.03); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block; padding: .2rem .6rem;
+      border-radius: 6px; font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .badge-green { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-blue { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: #fcd34d; }
+    .badge-pink { background: rgba(236,72,153,0.15); color: #f472b6; }
+    .badge-cyan { background: rgba(6,182,212,0.15); color: #67e8f9; }
+    .badge-red { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+    /* ── List ── */
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li {
+      padding: .5rem 0; display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .9rem; color: var(--text-2);
+    }
+    .feature-list li::before {
+      content: '▸'; color: var(--accent); font-weight: 700; flex-shrink: 0;
+      margin-top: .1rem;
+    }
+
+    /* ── Callout ── */
+    .callout {
+      background: rgba(99,102,241,0.06);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: .88rem; color: var(--text-2);
+    }
+    .callout strong { color: var(--text-1); }
+    .callout.warn {
+      background: rgba(245,158,11,0.06);
+      border-left-color: var(--accent3);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 3rem 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-3); font-size: .82rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero { padding: 3rem 1.5rem 2.5rem; }
+      .hero h1 { font-size: 2rem; }
+      .hero-stats { gap: 1.5rem; }
+      section { padding: 2.5rem 0; }
+      h2 { font-size: 1.4rem; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .arch-diagram { padding: 1.5rem; }
+      pre { font-size: .75rem; padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ HERO ════════ -->
+<header class="hero">
+  <div class="hero-badge">📄 Documentation Technique v2.0</div>
+  <h1>Pedantix Enhanced</h1>
+  <p>Architecture logicielle, algorithmes NLP, systèmes temps réel et conception modulaire d'un jeu de devinettes Wikipédia.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">14</span><span class="label">Modules JS</span></div>
+    <div class="hero-stat"><span class="num">8</span><span class="label">Fichiers CSS</span></div>
+    <div class="hero-stat"><span class="num">580</span><span class="label">Lignes HTML</span></div>
+    <div class="hero-stat"><span class="num">5</span><span class="label">Modes de jeu</span></div>
+  </div>
+</header>
+
+<!-- ════════ NAV ════════ -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#overview">Vue d'ensemble</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#nlp">NLP & Matching</a>
+    <a href="#game-loop">Game Loop</a>
+    <a href="#multiplayer">Multijoueur</a>
+    <a href="#daily">Mode Quotidien</a>
+    <a href="#rendering">Rendu UI</a>
+    <a href="#state">State Management</a>
+    <a href="#firebase">Firebase</a>
+    <a href="#seo">SEO</a>
+    <a href="#modules">Modules</a>
+    <a href="#stack">Stack</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ════════ OVERVIEW ════════ -->
+<section id="overview">
+  <div class="section-tag">01 — Présentation</div>
+  <h2>Qu'est-ce que Pedantix Enhanced ?</h2>
+  <p class="section-desc">Un jeu web de devinettes où le joueur doit retrouver le titre d'une page Wikipédia en proposant des mots un par un. Les mots trouvés sont révélés dans le texte, les autres colorent les blocs selon leur proximité sémantique.</p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(99,102,241,0.12)">🎮</div>
+        <div><div class="card-title">5 Modes de jeu</div><div class="card-subtitle">Solo, Catégories, Quotidien, Surprise, Multijoueur</div></div>
+      </div>
+      <ul class="feature-list">
+        <li>Solo avec 3 niveaux de difficulté</li>
+        <li>10 catégories thématiques</li>
+        <li>Mode quotidien synchronisé (minuit Paris)</li>
+        <li>Coopératif temps réel via Firebase</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(34,197,94,0.12)">🧠</div>
+        <div><div class="card-title">NLP Français embarqué</div><div class="card-subtitle">Zéro dépendance externe</div></div>
+      </div>
+      <ul class="feature-list">
+        <li>Normalisation Unicode (NFD + strip accents)</li>
+        <li>Lemmatiseur à 15 règles morphologiques</li>
+        <li>Word vectors par n-grammes de caractères</li>
+        <li>Similarité cosinus en temps réel</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12)">⚡</div>
+        <div><div class="card-title">Architecture modulaire</div><div class="card-subtitle">ES6 Modules, 0 bundler</div></div>
+      </div>
+      <ul class="feature-list">
+        <li>14 modules JavaScript autonomes</li>
+        <li>State centralisé (pattern Store)</li>
+        <li>Lazy-loading Firebase & AdSense</li>
+        <li>CSS modulaire en 8 fichiers</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ ARCHITECTURE ════════ -->
+<section id="architecture">
+  <div class="section-tag">02 — Architecture</div>
+  <h2>Vue d'ensemble de l'architecture</h2>
+  <p class="section-desc">Le projet suit une architecture <strong>SPA modulaire</strong> sans framework, utilisant les ES6 Modules natifs du navigateur. Pas de React, pas de Vue, pas de build step.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-label">Point d'entrée</div>
+    <div class="arch-row">
+      <div class="arch-box html">index.html<br><small>580 lignes · HTML + SEO</small></div>
+    </div>
+    <div class="arch-arrow">↓ imports ↓</div>
+
+    <div class="arch-label">Couche présentation</div>
+    <div class="arch-row">
+      <div class="arch-box css">variables.css</div>
+      <div class="arch-box css">base.css</div>
+      <div class="arch-box css">layout.css</div>
+      <div class="arch-box css">components.css</div>
+      <div class="arch-box css">game.css</div>
+      <div class="arch-box css">overlays.css</div>
+      <div class="arch-box css">ads.css</div>
+      <div class="arch-box css">responsive.css</div>
+    </div>
+    <div class="arch-arrow">↓</div>
+
+    <div class="arch-label">Point d'entrée JavaScript</div>
+    <div class="arch-row">
+      <div class="arch-box js" style="font-size:.9rem;padding:.8rem 2rem">app.js<br><small>Entry point · Event listeners · Orchestration</small></div>
+    </div>
+    <div class="arch-arrow">↓ importe ↓</div>
+
+    <div class="arch-label">Modules fonctionnels</div>
+    <div class="arch-row">
+      <div class="arch-box core">game.js</div>
+      <div class="arch-box core">ui.js</div>
+      <div class="arch-box core">wiki.js</div>
+      <div class="arch-box core">colab.js</div>
+      <div class="arch-box core">daily.js</div>
+      <div class="arch-box core">leaderboard.js</div>
+    </div>
+
+    <div class="arch-label">Modules utilitaires</div>
+    <div class="arch-row">
+      <div class="arch-box api">nlp.js</div>
+      <div class="arch-box api">audio.js</div>
+      <div class="arch-box api">timer.js</div>
+      <div class="arch-box api">ads.js</div>
+      <div class="arch-box api">firebase.js</div>
+    </div>
+    <div class="arch-arrow">↓ accèdent ↓</div>
+
+    <div class="arch-label">Couche données</div>
+    <div class="arch-row">
+      <div class="arch-box state">state.js<br><small>Store centralisé · Getters/Setters</small></div>
+      <div class="arch-box state">config.js<br><small>Constantes · Catégories · Stop words</small></div>
+    </div>
+    <div class="arch-arrow">↕ API externes ↕</div>
+    <div class="arch-row">
+      <div class="arch-box api">🌐 Wikipedia API</div>
+      <div class="arch-box api">🔥 Firebase RTDB</div>
+      <div class="arch-box api">📊 Wikimedia REST</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ NLP ════════ -->
+<section id="nlp">
+  <div class="section-tag">03 — Algorithmes NLP</div>
+  <h2>Traitement du Langage Naturel</h2>
+  <p class="section-desc">Le cœur algorithmique du jeu : comment déterminer si un mot proposé correspond à un mot du texte, et à quel point il en est proche.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🔤 Pipeline de normalisation</h3>
+      <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Chaque mot passe par 4 transformations pour maximiser les chances de correspondance :</p>
+      <div class="flow">
+        <div class="flow-step">mot brut</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">toLowerCase()</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">NFD decompose</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">strip accents</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step" style="border-color:rgba(34,197,94,0.4)">normalisé</div>
+      </div>
+<pre><span class="cm">// normalize("Géographie") → "geographie"</span>
+<span class="kw">export function</span> <span class="fn">normalize</span>(t) {
+  <span class="kw">return</span> t.<span class="fn">toLowerCase</span>()
+    .<span class="fn">normalize</span>(<span class="str">'NFD'</span>)
+    .<span class="fn">replace</span>(<span class="op">/[\u0300-\u036f]/g</span>, <span class="str">''</span>)
+    .<span class="fn">replace</span>(<span class="op">/[^a-z]/g</span>, <span class="str">''</span>);
+}</pre>
+    </div>
+
+    <div class="card">
+      <h3>📝 Lemmatiseur français</h3>
+      <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">15 règles morphologiques appliquées séquentiellement pour réduire les mots à leur forme de base :</p>
+      <table>
+        <tr><th>Règle</th><th>Exemple</th></tr>
+        <tr><td><code>/(aient|ussent|eraient)$/</code></td><td>marchaient → march</td></tr>
+        <tr><td><code>/(ais|ait|ons|ez)$/</code></td><td>parlons → parl</td></tr>
+        <tr><td><code>/(er|ir|re)$/</code></td><td>manger → mang</td></tr>
+        <tr><td><code>/(aux)$/ → 'al'</code></td><td>journaux → journal</td></tr>
+        <tr><td><code>/(eaux)$/ → 'eau'</code></td><td>gâteaux → gâteau</td></tr>
+        <tr><td><code>/(euses|euse)$/ → 'eux'</code></td><td>joyeuse → joyeux</td></tr>
+        <tr><td><code>/(s)$/</code></td><td>chats → chat</td></tr>
+      </table>
+      <div class="callout">
+        <strong>Contrainte :</strong> Le résultat doit faire ≥ 3 caractères et être différent du mot d'entrée, sinon la règle est ignorée.
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <h3>📐 Word Vectors par n-grammes de caractères</h3>
+    <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Pour mesurer la <strong>proximité sémantique</strong> entre le mot proposé et les mots cachés, on génère un vecteur de dimension <strong>512</strong> basé sur les n-grammes de caractères (unigrammes, bigrammes, trigrammes) :</p>
+
+<pre><span class="kw">const</span> V = <span class="num">512</span>; <span class="cm">// Dimension du vecteur</span>
+
+<span class="kw">export function</span> <span class="fn">wordVec</span>(word) {
+  <span class="kw">const</span> w = <span class="fn">normalize</span>(word), v = <span class="kw">new</span> <span class="fn">Float32Array</span>(V);
+
+  <span class="cm">// Hash function: Knuth multiplicative hash</span>
+  <span class="kw">const</span> <span class="fn">h</span> = (s, seed) => {
+    <span class="kw">let</span> h = seed * <span class="num">2654435761</span>;
+    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < s.length; i++) {
+      h = Math.<span class="fn">imul</span>(h ^ s.<span class="fn">charCodeAt</span>(i), <span class="num">2654435761</span>);
+      h ^= h >>> <span class="num">16</span>;
+    }
+    <span class="kw">return</span> Math.<span class="fn">abs</span>(h) % V;
+  };
+
+  <span class="cm">// Unigrammes: chaque caractère</span>
+  <span class="kw">for</span> (<span class="kw">const</span> c <span class="kw">of</span> w) v[<span class="fn">h</span>(c, <span class="num">0</span>)]++;
+  <span class="cm">// Bigrammes: paires de caractères consécutifs</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < w.length - <span class="num">1</span>; i++) v[<span class="fn">h</span>(w[i] + w[i+<span class="num">1</span>], <span class="num">1</span>)]++;
+  <span class="cm">// Trigrammes: triplets de caractères</span>
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < w.length - <span class="num">2</span>; i++) v[<span class="fn">h</span>(w[i]+w[i+<span class="num">1</span>]+w[i+<span class="num">2</span>], <span class="num">2</span>)]++;
+
+  <span class="kw">return</span> v;
+}</pre>
+
+    <div class="grid-2" style="margin-top:1.5rem">
+      <div class="callout">
+        <strong>Pourquoi des n-grammes de caractères ?</strong><br>
+        Contrairement aux word embeddings classiques (Word2Vec, GloVe) qui nécessitent des modèles de plusieurs Go, cette approche est <strong>100% côté client</strong>, instantanée, et capture les similarités morphologiques : « national » et « nation » partagent les trigrammes « nat », « ati », « tio », « ion ».
+      </div>
+      <div class="callout">
+        <strong>Similarité cosinus</strong><br>
+        La proximité entre deux mots est calculée par <code>cos(θ) = (A·B) / (‖A‖ × ‖B‖)</code>. Un score de 1.0 = identique, 0.0 = aucun rapport. Le résultat est affiché sous forme de <strong>feedback chaud/froid</strong> (🔥 > 0.75, ❄️ < 0.15).
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ GAME LOOP ════════ -->
+<section id="game-loop">
+  <div class="section-tag">04 — Game Loop</div>
+  <h2>Boucle de jeu principale</h2>
+  <p class="section-desc">De la sélection d'un article à la victoire, voici le cycle de vie complet d'une partie.</p>
+
+  <div class="card">
+    <h3>🔄 Cycle de vie d'une partie</h3>
+    <div class="flow" style="justify-content:flex-start">
+      <div class="flow-step" style="border-color:rgba(99,102,241,0.4)">📋 Catégorie</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="border-color:rgba(245,158,11,0.4)">🌐 Fetch Wikipedia</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="border-color:rgba(34,197,94,0.4)">✂️ Tokenize</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="border-color:rgba(6,182,212,0.4)">🎮 Render</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="border-color:rgba(236,72,153,0.4)">💬 Guess Loop</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step" style="border-color:rgba(34,197,94,0.4)">🏆 Win</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>1. Récupération d'article</h3>
+      <p style="color:var(--text-2);font-size:.88rem">Trois stratégies selon la difficulté :</p>
+      <table>
+        <tr><th>Difficulté</th><th>Source</th><th>Pool</th></tr>
+        <tr><td><span class="badge badge-green">Facile</span></td><td>Articles les + vus</td><td>Top 300</td></tr>
+        <tr><td><span class="badge badge-yellow">Normal</span></td><td>Articles populaires</td><td>Top 3000</td></tr>
+        <tr><td><span class="badge badge-red">Difficile</span></td><td>Articles aléatoires</td><td>∞</td></tr>
+      </table>
+      <div class="callout warn">
+        <strong>Filtres de qualité :</strong> Les articles < 800 caractères, les pages d'homonymie, les listes, et les articles avec < 80 mots significatifs sont automatiquement rejetés.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>2. Tokenisation</h3>
+      <p style="color:var(--text-2);font-size:.88rem">Le texte brut est découpé en tokens, chacun enrichi de métadonnées :</p>
+<pre><span class="cm">// Chaque token contient :</span>
+{
+  id: <span class="num">42</span>,           <span class="cm">// ID unique</span>
+  text: <span class="str">"Géographie"</span>, <span class="cm">// texte original</span>
+  lower: <span class="str">"géographie"</span>,
+  norm: <span class="str">"geographie"</span>,  <span class="cm">// sans accents</span>
+  lemma: <span class="str">"geograph"</span>,  <span class="cm">// lemmatisé</span>
+  lemNorm: <span class="str">"geograph"</span>,
+  vec: Float32Array(<span class="num">512</span>), <span class="cm">// vecteur</span>
+  isWord: <span class="kw">true</span>,
+  isStop: <span class="kw">false</span>,      <span class="cm">// mot vide ?</span>
+  revealed: <span class="kw">false</span>,    <span class="cm">// trouvé ?</span>
+  bestProx: <span class="num">0</span>,       <span class="cm">// meilleure similarité</span>
+  bestGuess: <span class="kw">null</span>    <span class="cm">// mot le + proche</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>3. Algorithme de matching (guess)</h3>
+    <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Quand le joueur propose un mot, <strong>6 comparaisons</strong> sont effectuées contre chaque mot caché :</p>
+<pre><span class="cm">// Pour chaque mot non-révélé du texte :</span>
+<span class="kw">const</span> match =
+  lo === t.lower    || <span class="cm">// 1. Correspondance exacte (minuscule)</span>
+  nm === t.norm     || <span class="cm">// 2. Formes normalisées identiques</span>
+  lm === t.lemma    || <span class="cm">// 3. Lemmes identiques</span>
+  lmn === t.lemNorm || <span class="cm">// 4. Lemmes normalisés identiques</span>
+  nm === t.lemNorm  || <span class="cm">// 5. Normalisé vs lemme normalisé</span>
+  lmn === t.norm;      <span class="cm">// 6. Lemme normalisé vs normalisé</span>
+
+<span class="cm">// Si aucun match → calcul de similarité cosinus</span>
+<span class="kw">const</span> sim = <span class="fn">cosSim</span>(guessVec, t.vec);
+<span class="cm">// Met à jour la meilleure proximité du bloc</span></pre>
+    <div class="callout">
+      <strong>Exemple concret :</strong> Le joueur tape « mangent ». Le lemmatiseur donne « mang ». Le texte contient « manger » (lemme: « mang »). Match via la règle 3 → le mot est révélé. ✅
+    </div>
+  </div>
+</section>
+
+<!-- ════════ MULTIPLAYER ════════ -->
+<section id="multiplayer">
+  <div class="section-tag">05 — Multijoueur</div>
+  <h2>Système coopératif temps réel</h2>
+  <p class="section-desc">Architecture du mode multijoueur basé sur Firebase Realtime Database, avec synchronisation en temps réel des guesses et des mots révélés.</p>
+
+  <div class="card">
+    <h3>📡 Structure Firebase</h3>
+<pre><span class="str">sessions/</span>
+  <span class="str">{CODE_6_CHARS}/</span>
+    ├── host: <span class="str">"pseudo"</span>
+    ├── status: <span class="str">"waiting"</span> | <span class="str">"playing"</span> | <span class="str">"won"</span>
+    ├── createdAt: <span class="num">1720100000000</span>
+    ├── startedAt: <span class="num">1720100030000</span>
+    ├── <span class="str">players/</span>
+    │   ├── <span class="str">p_abc123/</span>
+    │   │   ├── name: <span class="str">"Alice"</span>
+    │   │   ├── color: <span class="str">"#6366f1"</span>
+    │   │   └── online: <span class="kw">true</span>  <span class="cm">← onDisconnect().remove()</span>
+    │   └── <span class="str">p_def456/</span> { ... }
+    ├── <span class="str">article/</span>
+    │   ├── title: <span class="str">"Tour Eiffel"</span>
+    │   ├── titleToksJSON: <span class="str">"[...]"</span>  <span class="cm">← tokens sérialisés (sans vecs)</span>
+    │   ├── secsJSON: <span class="str">"[...]"</span>
+    │   ├── totalWords: <span class="num">342</span>
+    │   └── url: <span class="str">"https://fr.wikipedia.org/..."</span>
+    ├── <span class="str">guesses/</span>
+    │   └── <span class="str">{pushId}/</span> { word, found, sim, playerName, playerColor, timestamp }
+    ├── <span class="str">revealed/</span>
+    │   ├── <span class="str">tour</span>: <span class="kw">true</span>
+    │   └── <span class="str">eiffel</span>: <span class="kw">true</span>
+    └── <span class="str">config/</span>
+        ├── difficulty: <span class="str">"easy"</span>
+        └── categories: [<span class="str">"geo"</span>]</pre>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🔌 Flux Host (créateur)</h3>
+      <ol class="feature-list">
+        <li>Génère un code à 6 caractères (A-Z, 2-9)</li>
+        <li>Crée la session dans Firebase</li>
+        <li>Écoute les joueurs qui rejoignent</li>
+        <li>Lance la partie → fetch article + tokenize</li>
+        <li>Sérialise les tokens (sans vecteurs) → Firebase</li>
+        <li>Met le status à « playing »</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>🔗 Flux Guest (invité)</h3>
+      <ol class="feature-list">
+        <li>Saisit le code à 6 caractères</li>
+        <li>Rejoint la session (ajout dans players/)</li>
+        <li>Écoute le changement de status → « playing »</li>
+        <li>Télécharge les tokens depuis Firebase</li>
+        <li>Reconstruit les word vectors localement</li>
+        <li>Synchronise les guesses en temps réel</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Astuce d'optimisation :</strong> Les word vectors (Float32Array de 512 dimensions) ne sont <strong>pas</strong> envoyés à Firebase — ils sont <strong>recalculés localement</strong> par chaque client. Cela réduit la taille du payload de ~95%.
+  </div>
+</section>
+
+<!-- ════════ DAILY ════════ -->
+<section id="daily">
+  <div class="section-tag">06 — Mode Quotidien</div>
+  <h2>Article du jour</h2>
+  <p class="section-desc">Un article identique pour tous les joueurs chaque jour, avec leaderboard dédié.</p>
+
+  <div class="card">
+    <h3>🎲 Sélection déterministe par seed</h3>
+    <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">L'article du jour est choisi via un <strong>hash déterministe</strong> de la date. Tous les joueurs obtiennent le même article sans communication serveur :</p>
+<pre><span class="kw">function</span> <span class="fn">dateSeed</span>(dateKey) {  <span class="cm">// dateKey = "2026-07-04"</span>
+  <span class="kw">let</span> h = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < dateKey.length; i++) {
+    h = Math.<span class="fn">imul</span>(h ^ dateKey.<span class="fn">charCodeAt</span>(i), <span class="num">2654435761</span>);
+    h ^= h >>> <span class="num">16</span>;
+  }
+  <span class="kw">return</span> Math.<span class="fn">abs</span>(h);  <span class="cm">// Nombre déterministe</span>
+}
+
+<span class="cm">// seed % pool.length → index de l'article dans le top 500</span></pre>
+    <div class="callout">
+      <strong>Fallback Firebase :</strong> Si Firebase est configuré, l'article est <strong>stocké en base</strong> pour garantir que tous les joueurs ont exactement le même, même si le top 500 de Wikipedia change en cours de journée.
+    </div>
+  </div>
+</section>
+
+<!-- ════════ RENDERING ════════ -->
+<section id="rendering">
+  <div class="section-tag">07 — Rendu UI</div>
+  <h2>Système de rendu</h2>
+  <p class="section-desc">Comment les blocs de mots sont colorés et mis à jour de manière performante.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🎨 Palette de proximité</h3>
+      <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Les blocs cachés changent de couleur selon la meilleure proximité observée :</p>
+      <table>
+        <tr><th>Proximité</th><th>Couleur (dark)</th><th>Visuel</th></tr>
+        <tr><td>0%</td><td>hsl(240, 18%, 22%)</td><td><span style="display:inline-block;width:40px;height:18px;border-radius:4px;background:hsl(240,18%,22%);vertical-align:middle"></span></td></tr>
+        <tr><td>25%</td><td>hsl(170, 68%, 30%)</td><td><span style="display:inline-block;width:40px;height:18px;border-radius:4px;background:hsl(170,68%,30%);vertical-align:middle"></span></td></tr>
+        <tr><td>50%</td><td>hsl(110, 70%, 37%)</td><td><span style="display:inline-block;width:40px;height:18px;border-radius:4px;background:hsl(110,70%,37%);vertical-align:middle"></span></td></tr>
+        <tr><td>75%</td><td>hsl(55, 77%, 43%)</td><td><span style="display:inline-block;width:40px;height:18px;border-radius:4px;background:hsl(55,77%,43%);vertical-align:middle"></span></td></tr>
+        <tr><td>100%</td><td>hsl(0, 85%, 50%)</td><td><span style="display:inline-block;width:40px;height:18px;border-radius:4px;background:hsl(0,85%,50%);vertical-align:middle"></span></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>⚡ Mise à jour incrémentale</h3>
+      <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Plutôt que de re-renderer tout le DOM à chaque guess, on utilise un <strong>diff ciblé</strong> :</p>
+      <ol class="feature-list">
+        <li>Indexer tous les <code>.word-block</code> par <code>dataset.id</code></li>
+        <li>Pour chaque token modifié, mettre à jour uniquement son élément</li>
+        <li>Si révélé : remplacer le nœud (clone + classe <code>flash-new</code>)</li>
+        <li>Si non-révélé : mettre à jour <code>backgroundColor</code></li>
+        <li>Scroll vers le premier mot nouvellement révélé</li>
+      </ol>
+      <div class="callout">
+        <strong>Complexité :</strong> O(n) par guess, où n = nombre total de tokens. Pas de re-render complet → 0 flash/flicker visible.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ STATE ════════ -->
+<section id="state">
+  <div class="section-tag">08 — State Management</div>
+  <h2>Gestion de l'état</h2>
+  <p class="section-desc">Un store centralisé inspiré de Vuex/Redux, mais sans framework. Toutes les variables partagées sont dans <code>state.js</code>, avec des setters explicites.</p>
+
+  <div class="card">
+    <h3>🗃️ Groupes d'état</h3>
+    <div class="grid-3" style="margin-top:1rem">
+      <div>
+        <h3 style="font-size:.88rem;color:var(--accent)">🎮 Game State</h3>
+        <ul class="feature-list" style="font-size:.82rem">
+          <li><code>game</code> — données de la partie</li>
+          <li><code>gameStartedAt</code> — timestamp</li>
+          <li><code>currentDiff</code> — easy/normal/hard</li>
+          <li><code>scorePublished</code> — flag</li>
+          <li><code>tid</code> — compteur de tokens</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:.88rem;color:var(--accent4)">👥 Colab State</h3>
+        <ul class="feature-list" style="font-size:.82rem">
+          <li><code>colabMode</code> — solo/host/guest</li>
+          <li><code>colabSessionCode</code></li>
+          <li><code>colabPlayerName</code></li>
+          <li><code>colabPlayers</code> — objet joueurs</li>
+          <li><code>colabUnsubscribers</code> — cleanup</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:.88rem;color:var(--accent3)">📅 Daily State</h3>
+        <ul class="feature-list" style="font-size:.82rem">
+          <li><code>dailyActiveDate</code></li>
+          <li><code>dailySelectedDay</code></li>
+          <li><code>dailySort</code></li>
+          <li><code>dailyCountdownInterval</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Pourquoi des setters ?</strong> Les ES Modules exportent des <strong>bindings en lecture seule</strong>. On ne peut pas écrire <code>import { game } from './state.js'; game = newValue;</code> — il faut passer par <code>setGame(newValue)</code>. C'est une contrainte de la spec ES6, pas un choix de design.
+  </div>
+</section>
+
+<!-- ════════ FIREBASE ════════ -->
+<section id="firebase">
+  <div class="section-tag">09 — Firebase</div>
+  <h2>Backend Firebase</h2>
+  <p class="section-desc">Firebase Realtime Database est utilisé pour 3 fonctionnalités : multijoueur, leaderboard, et mode quotidien.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🔥 Chargement lazy</h3>
+      <p style="color:var(--text-2);font-size:.88rem;margin-bottom:1rem">Firebase n'est chargé que quand c'est nécessaire — le joueur solo ne télécharge <strong>jamais</strong> le SDK Firebase :</p>
+<pre><span class="kw">async function</span> <span class="fn">getFirebase</span>() {
+  <span class="kw">if</span> (_fb) <span class="kw">return</span> _fb;
+  <span class="cm">// Dynamic import — chargé à la demande</span>
+  <span class="kw">const</span> [appMod, dbMod] = <span class="kw">await</span> Promise.<span class="fn">all</span>([
+    <span class="kw">import</span>(<span class="str">'https://...firebase-app.js'</span>),
+    <span class="kw">import</span>(<span class="str">'https://...firebase-database.js'</span>)
+  ]);
+  <span class="cm">// ~130 KB au lieu de 0 pour le solo</span>
+}</pre>
+    </div>
+
+    <div class="card">
+      <h3>📊 Structure de la base</h3>
+<pre><span class="str">leaderboard/</span>
+  <span class="str">{articleKey}/</span>
+    └── <span class="str">{pushId}/</span> { pseudo, time, guesses,
+                    score, difficulty, mode,
+                    playerCount, date }
+
+<span class="str">daily/</span>
+  <span class="str">{YYYY-MM-DD}/</span>
+    ├── <span class="str">article/</span> { title, extract, url }
+    └── <span class="str">scores/</span>
+        └── <span class="str">{pushId}/</span> { ... }
+
+<span class="str">sessions/</span>
+  <span class="str">{CODE}/</span> <span class="cm">← voir section Multijoueur</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ SEO ════════ -->
+<section id="seo">
+  <div class="section-tag">10 — SEO</div>
+  <h2>Optimisation pour les moteurs de recherche</h2>
+  <p class="section-desc">Le site est une SPA mais reste indexable grâce à plusieurs techniques complémentaires.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>🏷️ Méta-données</h3>
+      <ul class="feature-list">
+        <li><strong>Open Graph</strong> complet (Facebook, LinkedIn, Discord)</li>
+        <li><strong>Twitter Card</strong> summary_large_image</li>
+        <li><strong>JSON-LD</strong> WebApplication + FAQPage</li>
+        <li><strong>Canonical URL</strong> + hreflang fr + x-default</li>
+        <li><strong>robots.txt</strong> avec sitemap</li>
+        <li><strong>sitemap.xml</strong> avec lastmod</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📄 Contenu pour crawlers</h3>
+      <ul class="feature-list">
+        <li>Bloc <code>&lt;noscript&gt;</code> avec description complète du jeu</li>
+        <li>Section <code>#seo-content</code> visible avec tout le texte SEO</li>
+        <li>FAQ structurée en HTML sémantique</li>
+        <li>~120 mots-clés dans les meta keywords</li>
+        <li>Score Lighthouse SEO : objectif 100/100</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ MODULES ════════ -->
+<section id="modules">
+  <div class="section-tag">11 — Modules</div>
+  <h2>Référence des 14 modules</h2>
+  <p class="section-desc">Chaque module a une responsabilité unique et des dépendances explicites.</p>
+
+  <table>
+    <thead>
+      <tr><th>Module</th><th>Responsabilité</th><th>Taille</th><th>Dépendances</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>state.js</code></td><td>Store centralisé mutable + setters</td><td><span class="badge badge-green">2.8 KB</span></td><td>Aucune</td></tr>
+      <tr><td><code>config.js</code></td><td>Catégories, stop words, URLs, ad config</td><td><span class="badge badge-green">3.7 KB</span></td><td>Aucune</td></tr>
+      <tr><td><code>nlp.js</code></td><td>normalize, lemmatize, wordVec, cosSim</td><td><span class="badge badge-green">1.7 KB</span></td><td>Aucune</td></tr>
+      <tr><td><code>firebase.js</code></td><td>Lazy-loading Firebase SDK</td><td><span class="badge badge-green">1.1 KB</span></td><td>state</td></tr>
+      <tr><td><code>timer.js</code></td><td>Chronomètre (start/stop/format)</td><td><span class="badge badge-green">1.0 KB</span></td><td>state</td></tr>
+      <tr><td><code>audio.js</code></td><td>Web Audio (beep, sons) + confetti + cascade</td><td><span class="badge badge-blue">2.4 KB</span></td><td>state</td></tr>
+      <tr><td><code>ui.js</code></td><td>Toast, couleurs, tokens DOM, stats, joueurs</td><td><span class="badge badge-yellow">9.0 KB</span></td><td>state</td></tr>
+      <tr><td><code>game.js</code></td><td>Tokenizer, guess, scoring, revealByNorm</td><td><span class="badge badge-blue">4.5 KB</span></td><td>state, config, nlp</td></tr>
+      <tr><td><code>wiki.js</code></td><td>API Wikipedia (articles, catégories, trending)</td><td><span class="badge badge-blue">5.1 KB</span></td><td>config, state, nlp</td></tr>
+      <tr><td><code>ads.js</code></td><td>AdSense lazy-load, create/show/hide ads</td><td><span class="badge badge-blue">3.5 KB</span></td><td>state, config</td></tr>
+      <tr><td><code>colab.js</code></td><td>Sessions multijoueur, sync Firebase</td><td><span class="badge badge-pink">10.3 KB</span></td><td>state, config, firebase, ui, game, nlp, timer</td></tr>
+      <tr><td><code>daily.js</code></td><td>Mode quotidien (dates Paris, seed, overlay)</td><td><span class="badge badge-cyan">6.4 KB</span></td><td>state, firebase, timer, wiki, leaderboard</td></tr>
+      <tr><td><code>leaderboard.js</code></td><td>Scores, classement, rendu table</td><td><span class="badge badge-cyan">6.2 KB</span></td><td>state, firebase, timer, ui, game</td></tr>
+      <tr><td><code>app.js</code></td><td>Entry point, event listeners, orchestration</td><td><span class="badge badge-pink">23.2 KB</span></td><td>Tous</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout" style="margin-top:1.5rem">
+    <strong>Total JS :</strong> ~81 KB (non minifié) répartis en 14 fichiers. Le navigateur charge tous les modules en parallèle grâce aux ES6 imports statiques, et Firebase (~130 KB) n'est chargé qu'à la demande.
+  </div>
+</section>
+
+<!-- ════════ STACK ════════ -->
+<section id="stack">
+  <div class="section-tag">12 — Stack Technique</div>
+  <h2>Technologies utilisées</h2>
+
+  <div class="grid-3">
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🌐</div>
+      <div class="card-title">Vanilla JS</div>
+      <div class="card-subtitle" style="margin-top:.3rem">ES6 Modules natifs<br>Aucun framework</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🎨</div>
+      <div class="card-title">CSS pur</div>
+      <div class="card-subtitle" style="margin-top:.3rem">CSS Variables + @media<br>Dark/Light theme</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔥</div>
+      <div class="card-title">Firebase</div>
+      <div class="card-subtitle" style="margin-top:.3rem">Realtime Database<br>Hosting</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">📖</div>
+      <div class="card-title">Wikipedia API</div>
+      <div class="card-subtitle" style="margin-top:.3rem">MediaWiki Action API<br>Wikimedia REST API</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">🔊</div>
+      <div class="card-title">Web Audio API</div>
+      <div class="card-subtitle" style="margin-top:.3rem">Oscillateur + Gain<br>Sons procéduraux</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">💰</div>
+      <div class="card-title">AdSense</div>
+      <div class="card-subtitle" style="margin-top:.3rem">Lazy-loaded<br>Emplacements discrets</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:2rem">
+    <h3>📈 Métriques du projet</h3>
+    <table>
+      <tr><th>Métrique</th><th>Valeur</th></tr>
+      <tr><td>Fichiers total</td><td><strong>25</strong> (1 HTML + 8 CSS + 14 JS + 2 config)</td></tr>
+      <tr><td>index.html</td><td><strong>580 lignes</strong> (HTML + SEO uniquement)</td></tr>
+      <tr><td>CSS total</td><td><strong>~1 470 lignes</strong> en 8 fichiers</td></tr>
+      <tr><td>JS total</td><td><strong>~1 650 lignes</strong> en 14 modules</td></tr>
+      <tr><td>Poids total (non minifié)</td><td><strong>~115 KB</strong> HTML + ~50 KB CSS + ~81 KB JS</td></tr>
+      <tr><td>Dépendances externes</td><td><strong>0</strong> (Firebase chargé dynamiquement)</td></tr>
+      <tr><td>Framework</td><td><strong>Aucun</strong> — Vanilla JS + ES6 Modules</td></tr>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Pedantix Enhanced — Documentation Technique</p>
+  <p style="margin-top:.4rem">Généré le 4 juillet 2026 · <a href="https://pedentixenhanced.com" target="_blank">pedentixenhanced.com</a></p>
+</footer>
+
+</body>
+</html>
