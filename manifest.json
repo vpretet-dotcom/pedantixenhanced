@@ -1,0 +1,26 @@
+{
+  "name": "Pedantix — Jeu de Mots Wikipédia",
+  "short_name": "Pedantix",
+  "description": "Devinez la page Wikipédia en retrouvant les mots cachés. Jeu gratuit avec mode solo, multijoueur et quotidien.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07070f",
+  "theme_color": "#6366f1",
+  "lang": "fr",
+  "orientation": "any",
+  "categories": ["games", "education", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
